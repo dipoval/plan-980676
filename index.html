@@ -804,7 +804,11 @@
       wrist:  '<line x1="8" y1="44" x2="30" y2="44" stroke-width="5"/><circle cx="8" cy="44" r="4"/><path d="M30 44 L42 36"/><circle cx="42" cy="36" r="4"/><path d="M54 42 L54 28"/><path d="M50 32 L54 28 L58 32"/>',
       shrug:  '<circle cx="28" cy="10" r="6"/><path d="M28 16 L28 40"/><path d="M28 40 L20 56"/><path d="M28 40 L36 56"/><path d="M28 20 L18 38"/><path d="M28 20 L38 38"/><circle cx="18" cy="38" r="4"/><circle cx="38" cy="38" r="4"/><path d="M14 20 L14 12"/><path d="M10 16 L14 12 L18 16"/><path d="M42 20 L42 12"/><path d="M38 16 L42 12 L46 16"/>',
       core:   '<circle cx="10" cy="30" r="6"/><line x1="16" y1="32" x2="50" y2="40"/><path d="M16 32 L16 44"/><line x1="8" y1="46" x2="56" y2="46"/>',
-      calf:   '<circle cx="30" cy="10" r="6"/><path d="M30 16 L30 40"/><path d="M30 20 L22 30"/><path d="M30 20 L38 30"/><path d="M30 40 L30 48 L36 52"/><path d="M46 44 L46 32"/><path d="M42 36 L46 32 L50 36"/><line x1="8" y1="56" x2="56" y2="56"/>'
+      calf:   '<circle cx="30" cy="10" r="6"/><path d="M30 16 L30 40"/><path d="M30 20 L22 30"/><path d="M30 20 L38 30"/><path d="M30 40 L30 48 L36 52"/><path d="M46 44 L46 32"/><path d="M42 36 L46 32 L50 36"/><line x1="8" y1="56" x2="56" y2="56"/>',
+      // Aislado de rodilla (spec de plantilla §4.8): extensión sentado (legext) y
+      // flexión boca abajo (legcurl) — patrones opuestos, por eso íconos distintos.
+      legext: '<circle cx="18" cy="10" r="6"/><path d="M18 16 L18 38"/><path d="M18 38 L38 38"/><path d="M38 38 L50 28"/><circle cx="50" cy="28" r="3.5"/><line x1="10" y1="44" x2="40" y2="44" stroke-width="5"/><path d="M40 44 L40 56"/><path d="M58 48 L58 34"/><path d="M54 38 L58 34 L62 38"/>',
+      legcurl: '<circle cx="10" cy="30" r="6"/><path d="M16 32 L40 32"/><path d="M40 32 L32 16"/><circle cx="32" cy="16" r="3.5"/><line x1="8" y1="40" x2="44" y2="40" stroke-width="5"/><path d="M26 40 L26 54"/><path d="M52 32 L52 18"/><path d="M48 22 L52 18 L56 22"/>'
     };
     function svgIcon(name, cls){
       return '<svg class="'+cls+'" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICONS[name]+'</svg>';
@@ -889,7 +893,14 @@
       // Bloques 2-4: mantiene el estímulo de tensión de "fuerza" sin acercarse a
       // series de 1-3 reps cerca del 100% 1RM en una sola articulación pequeña —
       // ver SAFETY_MESSAGES.aislamiento_codo y §metodologia.
-      tensionModerada: [ {reps:8,pct:72}, {reps:6,pct:76}, {reps:5,pct:80} ]
+      tensionModerada: [ {reps:8,pct:72}, {reps:6,pct:76}, {reps:5,pct:80} ],
+      // Zona marcada F y H a la vez (regla desde 2026-09-23, spec de plantilla
+      // §4.2): series pesadas primero y después series de volumen, en el mismo
+      // ejercicio. Sin onda semanal: el tope pesado es fijo en 90%.
+      mixto:           [ {reps:5,pct:85}, {reps:3,pct:90}, {reps:10,pct:70}, {reps:10,pct:70} ],
+      // Mismo principio para aislamiento de una articulación: el tramo pesado se
+      // queda en el rango de tensión moderada (≤80%), nunca en 85-90%.
+      mixtoModerado:   [ {reps:8,pct:72}, {reps:6,pct:78}, {reps:12,pct:65}, {reps:12,pct:65} ]
     };
     function round5(n){ return Math.round(n*2)/2; }
     var FUERZA_WAVE = [90,93,96,99];
@@ -1039,7 +1050,7 @@
       var items = day.ej.map(function(row){
         var e = EXERCISES[row.id];
       if(!e) return "";
-        var LADDER_CHIP_HTML = { fuerza:'<span class="chip chip-fuerza">Fuerza</span>', hipertrofia:'<span class="chip chip-hipertrofia">Hipertrofia</span>', tensionModerada:'<span class="chip chip-cardio">Tensión moderada</span>' };
+        var LADDER_CHIP_HTML = { fuerza:'<span class="chip chip-fuerza">Fuerza</span>', hipertrofia:'<span class="chip chip-hipertrofia">Hipertrofia</span>', tensionModerada:'<span class="chip chip-cardio">Tensión moderada</span>', mixto:'<span class="chip chip-fuerza">Fuerza + hipertrofia</span>', mixtoModerado:'<span class="chip chip-cardio">Tensión + volumen</span>' };
         var ladderChip = row.ladder===null ? "" : (LADDER_CHIP_HTML[row.ladder] || "");
         return '<div class="card panel" style="margin-bottom:10px;">'+
           '<div class="ex-name-cell">'+ Icons.svgIcon(e.icon,"ex-icon") +
@@ -1274,13 +1285,16 @@
       if(row.ladder===null){
         var nivel = Progression.nivelActual(row.id, blockId);
         var dose = (e.bw && e.bw[nivel]) ? e.bw[nivel] : {sets:3, variante:"", dosis:"progresión gradual"};
+        // dosis puede ser un array, una dosis por serie (zonas F+H: series
+        // pesadas + series de volumen) — ver dosisResumen().
+        var dosisDeSerie = function(d, si){ return Array.isArray(d) ? (d[si] || d[d.length-1]) : d; };
         var bwRows = [];
         for(var si=0; si<dose.sets; si++){
           var bwKey = "chk_pd"+programDay+"_"+row.id+"_"+si;
           var bwChecked = Storage.lsGet(bwKey) === "1";
           bwRows.push('<label class="rung-row'+(bwChecked?" is-done":"")+'" data-chk-key="'+bwKey+'">'+
             '<input type="checkbox" class="rung-check"'+(bwChecked?" checked":"")+'>'+
-            '<span class="rung-reps">Serie '+(si+1)+' · '+dose.dosis+'</span>'+
+            '<span class="rung-reps">Serie '+(si+1)+' · '+dosisDeSerie(dose.dosis, si)+'</span>'+
           '</label>');
         }
         body = bwRows.join("");
@@ -1291,7 +1305,7 @@
           nivelControls = '<select class="nivel-select" data-nivel-ex="'+row.id+'">'+opts+'</select>';
           var nvRows = [1,2,3,4].map(function(n){
             var lv = e.bw[n];
-            return '<div class="nv-row'+(n===nivel?" is-current":"")+'"><span class="nv-dot">'+(n===nivel?"●":n)+'</span><span>'+lv.variante+' · '+lv.dosis+'</span></div>';
+            return '<div class="nv-row'+(n===nivel?" is-current":"")+'"><span class="nv-dot">'+(n===nivel?"●":n)+'</span><span>'+lv.variante+' · '+dosisResumen(lv.dosis)+'</span></div>';
           }).join("");
           body += '<details class="niveles"><summary></summary><div class="niveles-list">'+nvRows+'</div></details>';
         }
@@ -1321,6 +1335,19 @@
         safety+
         '<details class="tech"><summary></summary><ul class="exlib-cues">'+cues+'</ul></details>'+
       '</div>';
+    }
+
+    // "series 1–2: 6 reps · series 3–4: 12 reps" a partir de un array de dosis;
+    // un string pasa tal cual.
+    function dosisResumen(d){
+      if(!Array.isArray(d)) return d;
+      var partes = [], i = 0;
+      while(i < d.length){
+        var j = i; while(j+1 < d.length && d[j+1] === d[i]) j++;
+        partes.push((i===j ? "serie "+(i+1) : "series "+(i+1)+"–"+(j+1))+": "+d[i]);
+        i = j+1;
+      }
+      return partes.join(" · ");
     }
 
     var DOW_LETTERS = ["L","M","X","J","V","S","D"];
