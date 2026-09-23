@@ -1,0 +1,1608 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Plan de Entrenamiento</title>
+<style>
+  /* ---------- Tokens ---------- */
+  :root{
+    --bg:#F5F7FB; --surface:#FFFFFF; --surface-2:#EEF1F7;
+    --ink:#1B2230; --ink-2:#5B6472; --ink-3:#8991A0;
+    --line:#DCE0E8; --line-2:#C4CAD3;
+    --accent:#2B4BE0; --accent-ink:#FFFFFF; --accent-tint:#EBEFFE;
+    --amber:#B96A12; --amber-tint:#FBF0E1;
+    --teal:#0E7F72; --teal-tint:#E4F5F2;
+    --violet:#6E58C9; --violet-tint:#EEEAFB;
+    --danger:#C23B3B; --danger-tint:#FBEAEA;
+    --radius-s:8px; --radius-m:14px; --radius-l:20px;
+    --shadow: 0 1px 2px rgba(20,24,40,.04), 0 8px 24px -12px rgba(20,24,40,.12);
+    --font-display:"Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    --font-body:"Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    --font-mono:ui-monospace,"Cascadia Code","Consolas","SFMono-Regular",Menlo,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#10131B; --surface:#171B26; --surface-2:#1E2330;
+      --ink:#E9ECF3; --ink-2:#A6AEBD; --ink-3:#7C8494;
+      --line:#2A3040; --line-2:#3A4256;
+      --accent:#6C86FF; --accent-ink:#0B1020; --accent-tint:#1B2340;
+      --amber:#E0A050; --amber-tint:#2E2416;
+      --teal:#4FC7B8; --teal-tint:#122824;
+      --violet:#A79AE8; --violet-tint:#231E3B;
+      --danger:#E58080; --danger-tint:#2E1818;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 28px -12px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#10131B; --surface:#171B26; --surface-2:#1E2330;
+    --ink:#E9ECF3; --ink-2:#A6AEBD; --ink-3:#7C8494;
+    --line:#2A3040; --line-2:#3A4256;
+    --accent:#6C86FF; --accent-ink:#0B1020; --accent-tint:#1B2340;
+    --amber:#E0A050; --amber-tint:#2E2416;
+    --teal:#4FC7B8; --teal-tint:#122824;
+    --violet:#A79AE8; --violet-tint:#231E3B;
+    --danger:#E58080; --danger-tint:#2E1818;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 28px -12px rgba(0,0,0,.5);
+  }
+
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:var(--font-body); font-size:15px; line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,h4{ font-family:var(--font-display); font-weight:650; letter-spacing:-.02em; text-wrap:balance; margin:0; color:var(--ink);}
+  p{margin:0;}
+  a{color:var(--accent);}
+  ::selection{background:var(--accent-tint); color:var(--ink);}
+  .mono{font-family:var(--font-mono); font-variant-numeric:tabular-nums;}
+  button{font-family:var(--font-body);}
+  :focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+
+  .wrap{max-width:1080px; margin:0 auto; padding:0 20px;}
+  .wrap-narrow{max-width:560px; margin:0 auto; padding:18px 16px 40px;}
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    position:sticky; top:0; z-index:60; display:flex; align-items:center; justify-content:space-between;
+    height:52px; padding:0 16px; background:color-mix(in srgb, var(--surface) 92%, transparent);
+    backdrop-filter:blur(10px); border-bottom:.6pt solid var(--line);
+  }
+  .topbar .brand{font-weight:650; font-size:14px; letter-spacing:-.01em;}
+  .icon-btn{
+    border:.6pt solid var(--line); background:var(--surface-2); color:var(--ink-2); border-radius:999px;
+    width:34px; height:34px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .icon-btn svg{width:16px; height:16px;}
+
+  main{padding-bottom:104px;}
+  .tab-panel{display:none;}
+  .tab-panel.is-active{display:block;}
+
+  /* ---------- Bottom tab bar ---------- */
+  .tabbar{
+    position:fixed; left:0; right:0; bottom:0; z-index:70; display:flex; background:var(--surface);
+    border-top:.6pt solid var(--line); padding-bottom:env(safe-area-inset-bottom,0);
+    box-shadow:0 -4px 16px -8px rgba(20,24,40,.15);
+  }
+  .tabbar button{
+    flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; padding:9px 4px 8px;
+    background:none; border:none; color:var(--ink-3); font-size:10.5px; font-weight:650; cursor:pointer;
+  }
+  .tabbar button svg{width:21px; height:21px;}
+  .tabbar button.is-active{color:var(--accent);}
+  .tabbar button .ind{width:22px; height:3px; border-radius:99px; background:transparent;}
+  .tabbar button.is-active .ind{background:var(--accent);}
+
+  /* ---------- Section shell (used inside Plan completo tab) ---------- */
+  .subsection{padding:36px 0;}
+  .subsection + .subsection{border-top:.6pt solid var(--line);}
+  .section-head{margin-bottom:20px; max-width:70ch;}
+  .section-kicker{font-size:11.5px; font-weight:650; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-3); margin-bottom:6px;}
+  .section-head h2{font-size:clamp(20px,2.4vw,25px);}
+  .section-head .desc{margin-top:8px; color:var(--ink-2); font-size:14.5px;}
+
+  /* ---------- Cards ---------- */
+  .card{background:var(--surface); border:.6pt solid var(--line); border-radius:var(--radius-m); box-shadow:var(--shadow);}
+  .panel{padding:18px 20px;}
+  .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  @media screen and (max-width:720px){ .grid-2{grid-template-columns:1fr;} }
+
+  /* ---------- Chips ---------- */
+  .chip{display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:650; letter-spacing:.01em; padding:3px 9px; border-radius:999px;}
+  .chip-fuerza{background:var(--accent-tint); color:var(--accent);}
+  .chip-hipertrofia{background:var(--amber-tint); color:var(--amber);}
+  .chip-movilidad{background:var(--teal-tint); color:var(--teal);}
+  .chip-cardio{background:var(--violet-tint); color:var(--violet);}
+
+  /* ---------- Tables (Plan completo tab) ---------- */
+  .tbl-scroll{overflow-x:auto; border-radius:var(--radius-m); border:.6pt solid var(--line);}
+  table{border-collapse:collapse; width:100%; min-width:520px; background:var(--surface);}
+  th,td{padding:9px 12px; text-align:left; border-bottom:.6pt solid var(--line); font-size:13.5px; white-space:nowrap;}
+  thead th{background:var(--surface-2); font-size:10.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-2); font-weight:650;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.num, th.num{font-family:var(--font-mono); font-variant-numeric:tabular-nums;}
+
+  .rm-input{
+    font-family:var(--font-mono); font-variant-numeric:tabular-nums; font-size:15px; text-align:right;
+    border:1.2pt solid var(--line-2); background:var(--surface-2); color:var(--ink); border-radius:var(--radius-s);
+    padding:8px 8px;
+  }
+  .rm-input:focus{outline:2px solid var(--accent); outline-offset:1px;}
+
+  /* ---------- Exercise icon / name ---------- */
+  .ex-icon{width:38px; height:38px; flex:none; color:var(--ink-2);}
+  .ex-name-cell{display:flex; align-items:center; gap:10px;}
+  .ex-name{font-weight:600;}
+  .ex-name .en{display:block; font-size:11px; color:var(--ink-3); font-weight:400;}
+
+  .day-block{margin-top:18px;}
+  .day-title{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
+  .day-title h4{font-size:15px;}
+
+  .exlib-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px;}
+  @media screen and (max-width:860px){ .exlib-grid{grid-template-columns:repeat(2,1fr);} }
+  @media screen and (max-width:560px){ .exlib-grid{grid-template-columns:1fr;} }
+  .exlib-card{padding:16px;}
+  .exlib-top{display:flex; gap:12px; align-items:flex-start;}
+  .exlib-icon{width:46px; height:46px; flex:none; color:var(--accent);}
+  .exlib-cues{margin:10px 0 0; padding-left:18px; font-size:12.8px; color:var(--ink-2);}
+  .exlib-cues li{margin-bottom:3px;}
+  .exlib-links{display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;}
+  .btnlink{
+    font-size:11.5px; font-weight:600; color:var(--ink); background:var(--surface-2); border:.6pt solid var(--line);
+    padding:6px 10px; border-radius:999px; text-decoration:none;
+  }
+  .btnlink:hover{border-color:var(--line-2);}
+  /* Nota de técnica por ejercicio. Va en el acento, no en rojo de alarma: en este
+     plan estos mensajes son coaching (cómo respirar, qué rango usar), no avisos de
+     peligro, y se muestran en cada sesión durante las 24 semanas. */
+  .safety-flag{
+    margin-top:10px; display:flex; gap:7px; font-size:12px; color:var(--accent); background:var(--accent-tint);
+    border-radius:var(--radius-s); padding:7px 9px;
+  }
+
+  /* ---------- Timeline / week grid (Plan completo) ---------- */
+  .timeline{display:grid; grid-template-columns:repeat(4,1fr); gap:12px;}
+  @media screen and (max-width:760px){ .timeline{grid-template-columns:1fr;} }
+  .tl-item{border-radius:var(--radius-m); padding:16px; border:.6pt solid var(--line); background:var(--surface);}
+  .tl-item .tl-weeks{font-family:var(--font-mono); font-size:11px; color:var(--ink-3); margin-bottom:8px;}
+  .tl-item h4{font-size:15.5px; margin-bottom:6px;}
+  .tl-item p{font-size:12.8px; color:var(--ink-2);}
+  .tl-bar{height:5px; border-radius:99px; background:var(--line); margin-top:12px; overflow:hidden;}
+  .tl-bar > span{display:block; height:100%; border-radius:99px;}
+
+  .week-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:8px;}
+  @media screen and (max-width:820px){ .week-grid{grid-template-columns:repeat(2,1fr);} }
+  .day-card{border-radius:var(--radius-m); border:.6pt solid var(--line); background:var(--surface); padding:12px 10px; text-align:left;}
+  .day-card .d-num{font-size:10.5px; color:var(--ink-3); font-weight:650; letter-spacing:.03em; text-transform:uppercase;}
+  .day-card .d-name{font-size:13px; font-weight:650; margin-top:5px;}
+  .day-card .d-tag{margin-top:8px;}
+
+  ul.plain{margin:0; padding-left:18px;}
+  ul.plain li{margin-bottom:6px; font-size:14px; color:var(--ink-2);}
+  ol.plain{margin:0; padding-left:20px;}
+  ol.plain li{margin-bottom:8px; font-size:14px; color:var(--ink-2);}
+  strong{color:var(--ink);}
+
+  .callout{border-radius:var(--radius-m); padding:16px 18px; border:.6pt solid var(--line);}
+  .callout-accent{background:var(--accent-tint); border-color:transparent;}
+  .callout-danger{background:var(--danger-tint); border-color:transparent;}
+  .callout h4{font-size:14px; margin-bottom:6px;}
+  .callout p, .callout li{font-size:13.3px;}
+
+  .credit{padding:26px 0 10px; color:var(--ink-3); font-size:12px; text-align:center;}
+
+  /* ================= Hoy tab ================= */
+  .hoy-head{margin-bottom:4px;}
+  .hoy-head h2{font-size:20px;}
+  .hoy-head .desc{margin-top:4px; color:var(--ink-2); font-size:13px;}
+  .hoy-head-row{display:flex; align-items:center; justify-content:space-between; gap:10px;}
+
+  .progress-ring{display:grid; place-items:center; width:40px; height:40px; flex:0 0 auto;}
+  .progress-ring svg{grid-area:1/1; transform:rotate(-90deg);}
+  .progress-ring-track{fill:none; stroke:var(--line); stroke-width:3;}
+  .progress-ring-fill{fill:none; stroke:var(--accent); stroke-width:3; stroke-linecap:round; transition:stroke-dashoffset .3s ease;}
+  .progress-ring-label{grid-area:1/1; font-size:11px; font-weight:650; color:var(--ink);}
+
+  .week-strip{display:flex; justify-content:space-between; gap:4px; margin-top:10px;}
+  .week-strip-day{display:flex; flex-direction:column; align-items:center; gap:4px; flex:1;}
+  .day-circle{width:36px; height:36px; border-radius:50%; border:1.2pt solid var(--line); background:var(--surface); color:var(--ink-3); font-size:14px; display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0;}
+  .day-circle.is-done{background:var(--accent-tint); border-color:var(--accent); color:var(--accent);}
+  .day-circle.is-today{border-color:var(--accent); border-width:2pt; color:var(--ink);}
+  .day-circle.is-preview{box-shadow:0 0 0 2px var(--accent-tint);}
+  .week-strip-dow{font-size:10.5px; color:var(--ink-3);}
+
+  .preview-banner{margin-top:8px; font-size:12.5px; color:var(--ink-2);}
+
+  .banner{border-radius:var(--radius-m); padding:12px 14px; font-size:12.8px; margin-top:12px; line-height:1.4;}
+  .banner b{display:block; font-size:13.3px; margin-bottom:2px;}
+  .banner-deload{background:var(--amber-tint); color:var(--amber);}
+  .banner-retest{background:var(--accent-tint); color:var(--accent);}
+
+  .block-tag{margin-top:10px; font-size:12px; color:var(--ink-2);}
+  .block-tag b{color:var(--ink);}
+
+  /* Sticky siempre, no solo en días cortos: en cualquier día, según dónde
+     haya quedado el scroll (auto o de un tap previo), el flujo normal
+     puede dejar este botón justo detrás de la tabbar fija (64px) — no
+     solo se ve mal, el click puede caer sobre el botón de la tabbar que
+     esté debajo (bug real: terminaba en «Plan completo» en vez de
+     avanzar de día). Sticky lo mantiene siempre por encima de la tabbar. */
+  .seq-bottom{position:sticky; bottom:calc(64px + env(safe-area-inset-bottom,0px)); background:var(--bg); padding-top:10px; padding-bottom:6px; z-index:65;}
+  .seq-nav{display:flex; gap:10px; margin-top:18px;}
+  .seq-btn{flex:1; border-radius:var(--radius-m); padding:14px 12px; font-size:13.5px; font-weight:650; cursor:pointer; border:1.2pt solid var(--line);}
+  .seq-btn-ghost{background:var(--surface); color:var(--ink-2); flex:0 0 108px;}
+  .seq-btn-ghost:disabled{opacity:.4; cursor:default;}
+  .seq-btn-primary{background:var(--accent); color:var(--accent-ink); border-color:var(--accent);}
+  .seq-btn-primary:disabled{opacity:.5; cursor:default;}
+
+  .seq-jump{margin-top:14px; text-align:center;}
+  .seq-jump summary{font-size:12px; color:var(--ink-3); cursor:pointer; list-style:none;}
+  .seq-jump summary::-webkit-details-marker{display:none;}
+  .seq-jump-body{display:flex; gap:8px; justify-content:center; margin-top:10px;}
+
+  .rest-card{text-align:center; padding:34px 20px;}
+  .rest-card h3{font-size:17px;}
+  .rest-card p{margin-top:8px; font-size:13.5px; color:var(--ink-2);}
+
+  .wk-card{margin-top:14px;}
+  .wk-head{display:flex; align-items:center; gap:10px;}
+  .wk-head .ex-icon{width:34px;height:34px;}
+  .wk-name{font-size:15.5px; font-weight:650;}
+  .wk-sub{font-size:11px; color:var(--ink-3);}
+
+  .rung-row{display:flex; align-items:center; gap:10px; padding:9px 0; border-top:.6pt solid var(--line);}
+  .rung-row:first-child{border-top:none;}
+  .rung-check{width:21px; height:21px; flex:none; accent-color:var(--accent);}
+  .rung-reps{font-size:13.5px; color:var(--ink-2); flex:1;}
+  .rung-pct{font-size:11px; color:var(--ink-3); font-family:var(--font-mono);}
+  .rung-kg{font-family:var(--font-mono); font-weight:700; font-size:17.5px; min-width:66px; text-align:right;}
+  .rung-row.is-done .rung-reps, .rung-row.is-done .rung-kg{opacity:.42; text-decoration:line-through;}
+
+  details.tech{margin-top:10px;}
+  details.tech summary{font-size:12px; font-weight:650; color:var(--accent); cursor:pointer; list-style:none;}
+  details.tech summary::-webkit-details-marker{display:none;}
+  details.tech summary::before{content:"Ver técnica ▾";}
+  details.tech[open] summary::before{content:"Ocultar técnica ▴";}
+  details.tech .exlib-cues{margin-top:8px;}
+
+  /* Nivel: control en la tarjeta de Hoy + acordeón de las 4 variantes.
+     Spec 2026-09-07 §5. */
+  .wk-controls{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:10px; flex-wrap:wrap;}
+  .nivel-select{
+    font:inherit; font-size:13px; font-weight:600; color:var(--ink); background:var(--surface);
+    border:1px solid var(--line-2); border-radius:8px; padding:6px 10px; cursor:pointer;
+  }
+  .nivel-select:focus-visible{outline:2px solid var(--accent); outline-offset:1px;}
+  details.niveles{margin-top:10px;}
+  details.niveles summary{font-size:12px; font-weight:650; color:var(--accent); cursor:pointer; list-style:none;}
+  details.niveles summary::-webkit-details-marker{display:none;}
+  details.niveles summary::before{content:"Los 4 niveles de este ejercicio ▾";}
+  details.niveles[open] summary::before{content:"Ocultar niveles ▴";}
+  .niveles-list{margin-top:8px; display:flex; flex-direction:column; gap:6px;}
+  .niveles-list .nv-row{display:flex; gap:8px; font-size:12.5px; color:var(--ink-2);}
+  .niveles-list .nv-row.is-current{color:var(--accent); font-weight:650;}
+  .niveles-list .nv-dot{width:16px; flex:none; text-align:center;}
+  .rm-group-title{font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-3); margin:16px 0 4px;}
+  .rm-group:first-child .rm-group-title{margin-top:0;}
+
+  .rm-nudge{display:flex; align-items:center; justify-content:space-between; gap:10px; background:var(--surface-2); border-radius:var(--radius-s); padding:9px 11px; font-size:12.5px; color:var(--ink-2);}
+  .rm-nudge button{background:var(--accent); color:var(--accent-ink); border:none; border-radius:999px; padding:6px 12px; font-size:11.5px; font-weight:650; cursor:pointer;}
+
+  /* ================= Mi progreso tab ================= */
+  .rm-row{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:11px 0; border-top:.6pt solid var(--line);}
+  .rm-row:first-child{border-top:none;}
+  .rm-row .rm-name{font-weight:600; font-size:13.8px;}
+  .rm-row .rm-pat{font-size:11px; color:var(--ink-3); margin-top:1px;}
+  .rm-row .rm-r{display:flex; align-items:center; gap:6px; flex:none;}
+  .rm-row .rm-input{width:66px;}
+  .rm-row .kgsuf{font-size:12px; color:var(--ink-2);}
+
+  @media print{
+    .topbar, .tabbar{display:none;}
+    body{background:#fff; color:#000;}
+    main{padding-bottom:0;}
+    .tab-panel{display:block !important;}
+    .subsection{padding:14px 0; break-inside:avoid;}
+    .card{box-shadow:none; border-color:#999;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="brand">Plan 6 Meses</span>
+  <button class="icon-btn" id="themeToggle" type="button" aria-label="Cambiar tema" title="Cambiar tema">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+  </button>
+</div>
+
+<main>
+
+  <!-- ============ TAB: HOY ============ -->
+  <section class="tab-panel is-active" data-tab="hoy" id="panel-hoy">
+    <div class="wrap-narrow">
+      <div class="hoy-head">
+        <div class="hoy-head-row">
+          <h2 id="seqTitle">Tu rutina de hoy</h2>
+          <div class="progress-ring" id="progressRing" role="img">
+            <svg viewBox="0 0 40 40" width="40" height="40">
+              <circle class="progress-ring-track" cx="20" cy="20" r="16"></circle>
+              <circle class="progress-ring-fill" id="progressRingFill" cx="20" cy="20" r="16"></circle>
+            </svg>
+            <span class="progress-ring-label" id="progressRingLabel">1</span>
+          </div>
+        </div>
+        <div class="week-strip" id="weekStrip" role="group" aria-label="Días de esta semana"></div>
+        <div id="previewBanner"></div>
+      </div>
+
+      <div class="callout callout-accent" style="margin-top:12px;">
+        <h4>Cómo está armado tu plan</h4>
+        <p>Este programa sale de tu ficha: ya haces estiramientos y movilidad 3 a 4 veces por semana, tienes bandas elásticas y tu propio peso, y cuatro días de 45–60 minutos. Marcaste una sola cualidad —<strong>flexibilidad y movilidad</strong>— y ninguna zona muscular, y el plan lo toma tal cual: las cuatro sesiones son de movilidad, cada una con un foco distinto (cadera y cadena posterior, columna y hombro, tobillo y cadera de pie, e integración). No hay pesas, cardio ni bloques de fuerza que no pediste. Que sea tu primer plan estructurado es una ventaja: las posiciones se aprenden bien desde el principio, y lo que ya haces por tu cuenta pasa a tener un orden y una progresión.</p>
+        <p style="margin-top:8px;">Usa tu criterio: estirar se siente como tensión, nunca como dolor. Si algo duele y no cede, o aparece mareo que no pasa, para y coméntalo con el relator.</p>
+      </div>
+
+      <div id="weekBanners"></div>
+
+      <p class="block-tag" id="blockTag"></p>
+
+      <div id="todayMount"></div>
+
+      <div class="seq-bottom">
+        <div class="seq-nav">
+          <button class="seq-btn seq-btn-ghost" id="dayPrev" type="button" aria-label="Día anterior">‹ Anterior</button>
+          <button class="seq-btn seq-btn-primary" id="dayNext" type="button">Marcar hecho y avanzar ›</button>
+        </div>
+
+        <details class="seq-jump">
+          <summary>Ir directo a otra semana</summary>
+          <div class="seq-jump-body">
+            <input type="number" id="jumpWeek" class="rm-input" min="1" max="24" step="1" style="width:70px;">
+            <button class="btnlink" id="jumpGo" type="button">Ir</button>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TAB: MI PROGRESO ============ -->
+  <section class="tab-panel" data-tab="rm" id="panel-rm">
+    <div class="wrap-narrow">
+      <div class="hoy-head">
+        <h2>Mi progreso</h2>
+        <p class="desc">En tu plan lo que sube es el <strong>nivel</strong> de cada ejercicio: cada uno tiene cuatro, de la posición básica al rango activo. Marca en qué nivel estás acá o directamente en la tarjeta del ejercicio en «Hoy» — los dos guardan el mismo valor. Se guarda en este navegador.</p>
+      </div>
+
+      <div class="card panel" style="margin-top:14px;">
+        <h4 style="font-size:13.5px; margin-bottom:10px;">Cómo saber si ya puedes subir de nivel</h4>
+        <ol class="plain" style="font-size:13px;">
+          <li>Llegas a la posición del nivel <strong>sin dolor</strong>, respirando parejo, y la sostienes el tiempo completo sin apretar la mandíbula ni los hombros.</li>
+          <li>Si te pasa en <strong>dos sesiones seguidas</strong>, sube un nivel.</li>
+          <li>Si la posición tira de más o necesitas aguantar la respiración para llegar, quédate donde estás una semana más. Sostener un nivel también es progresar: el rango se gana en semanas, no en una sesión.</li>
+        </ol>
+        <p style="margin-top:10px; font-size:12px; color:var(--ink-2);">Si marcas un nivel, ese es el que manda en «Hoy» hasta que tú lo cambies; sin marca, el plan muestra el que propone el bloque en que vas. Revísala en las <strong>semanas 1, 8, 12, 20 y 24</strong>, que son las de medición.</p>
+      </div>
+
+      <div class="card panel" style="margin-top:14px;">
+        <div id="rmList"></div>
+      </div>
+
+      <p style="margin-top:10px; font-size:12px; color:var(--ink-2);">Las mediciones de las semanas 1, 8, 12, 20 y 24 (cuatro pruebas simples, en «Plan completo» → Registro) son la mejor forma de ver cuánto rango ganaste: cámbiales el orden si quieres, pero hazlas siempre con la misma entrada en calor.</p>
+    </div>
+  </section>
+
+  <!-- ============ TAB: PLAN COMPLETO ============ -->
+  <section class="tab-panel" data-tab="plan" id="panel-plan">
+    <div class="wrap">
+
+      <div class="subsection" id="metodologia" style="padding-top:28px;">
+        <div class="section-head">
+          <div class="section-kicker">Ciencia del entrenamiento</div>
+          <h2>Cómo se gana rango</h2>
+          <p class="desc">Flexibilidad es cuánto se alarga un músculo; movilidad es cuánto de ese rango puedes <strong>usar y controlar</strong>. Estirar en pasivo abre el rango; la movilidad lo vuelve tuyo. Por eso el plan no se queda en sostener posiciones: cada bloque suma una herramienta nueva, y la última es fuerza en el rango final — el paso que hace que lo ganado no se pierda.</p>
+        </div>
+
+        <div class="grid-2">
+          <div class="card panel">
+            <span class="chip chip-movilidad">Las cuatro herramientas</span>
+            <h3 style="margin-top:10px; font-size:16px;">Qué cambia de un nivel a otro</h3>
+            <p style="margin-top:8px; color:var(--ink-2); font-size:13.5px;">Todas aparecen en la dosis que te muestra la pestaña «Hoy». Solo necesitas una banda, una pared y el suelo.</p>
+            <div class="tbl-scroll" style="margin-top:14px;">
+              <table>
+                <thead><tr><th>Herramienta</th><th>Cómo se hace</th></tr></thead>
+                <tbody>
+                  <tr><td>Estático</td><td>Llegas a la posición y la sostienes 30–45 seg respirando largo</td></tr>
+                  <tr><td>Contraer y relajar</td><td>En la posición, empujas contra la banda o el suelo 5 seg sin moverte, sueltas, y avanzas un poco más</td></tr>
+                  <tr><td>Rango activo</td><td>Llegas al rango y lo sostienes con tu propio músculo, sin ayuda de la mano ni de la banda</td></tr>
+                  <tr><td>Integración</td><td>Encadenas posiciones en movimiento lento, sin pausa entre una y otra</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p style="margin-top:10px; font-size:12px; color:var(--ink-2);">Descanso entre series: <strong>el que necesites para respirar normal</strong>, en general 20–40 seg. No hay apuro: acá el reloj no es el que manda.</p>
+          </div>
+
+          <div class="card panel">
+            <span class="chip chip-hipertrofia">Los cuatro bloques</span>
+            <h3 style="margin-top:10px; font-size:16px;">Cómo avanza el programa</h3>
+            <p style="margin-top:8px; color:var(--ink-2); font-size:13.5px;">Cada ejercicio tiene <strong>cuatro niveles</strong>, uno por bloque. No cambias de ejercicio: cambias de nivel dentro del mismo, y la posición que ya aprendiste te sigue sirviendo.</p>
+            <div class="tbl-scroll" style="margin-top:14px;">
+              <table>
+                <thead><tr><th>Bloque</th><th>Herramienta principal</th></tr></thead>
+                <tbody>
+                  <tr><td>1</td><td>Estático: aprender cada posición y dónde se siente</td></tr>
+                  <tr><td>2</td><td>Contraer y relajar: el rango se abre más rápido</td></tr>
+                  <tr><td>3</td><td>Rango activo: sostener el rango con tu músculo</td></tr>
+                  <tr><td>4</td><td>Integración: flujos y consolidación</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p style="margin-top:10px; font-size:12px; color:var(--ink-2);">No hay tablas de porcentaje de 1RM ni kilos en este plan: no los pediste y no hacen falta. Lo que se mide es el rango, con cuatro pruebas simples.</p>
+          </div>
+        </div>
+
+        <div class="callout callout-accent" style="margin-top:16px;">
+          <h4>Regla de progresión (autorregulada)</h4>
+          <p>Sube de nivel cuando llegas a la posición del nivel siguiente <strong>sin dolor y respirando parejo</strong> en dos sesiones seguidas, y anótalo en «Mi progreso». Si una posición tira de más, quédate un nivel más — no es un retroceso, es cómo funciona el método. Tú decides el ritmo; el calendario solo propone.</p>
+        </div>
+
+        <div class="callout callout-accent" style="margin-top:12px;">
+          <h4>Tensión, no dolor</h4>
+          <p>Piensa en una escala de 0 a 10: la posición correcta está en un <strong>6 o 7</strong> — tira, se nota, pero puedes respirar largo y soltar los hombros. Por encima de eso el cuerpo se defiende contrayendo el mismo músculo que intentas alargar, y el rango se cierra en vez de abrirse. Llegar a menos, respirando, abre más que forzar.</p>
+        </div>
+
+        <div class="card panel" style="margin-top:16px;">
+          <h4 style="font-size:14px; margin-bottom:10px;">Cobertura de la cualidad marcada en tu ficha</h4>
+          <ul class="plain">
+            <li><strong>Flexibilidad y movilidad:</strong> las cuatro sesiones de la semana, constantes en los 4 bloques y repartidas por zona para que cada articulación grande tenga su día: cadera y cadena posterior (lunes), columna y hombro (miércoles), tobillo y cadera de pie (jueves), e integración de todo el cuerpo (viernes).</li>
+          </ul>
+          <p style="margin-top:10px; font-size:12px; color:var(--ink-2);">No marcaste zonas musculares ni otras cualidades, así que el plan no incluye trabajo de fuerza, hipertrofia ni cardio. El rango activo del Bloque 3 sí te va a dar fuerza en las posiciones que ganes — es parte de la movilidad, no un plan de fuerza. Si en algún momento quieres sumar alguna cualidad, se ajusta.</p>
+        </div>
+      </div>
+
+      <div class="subsection" id="cronograma">
+        <div class="section-head">
+          <div class="section-kicker">Periodización por bloques</div>
+          <h2>24 semanas, 4 bloques</h2>
+          <p class="desc">Progresión de base a especialización: primero se aprenden las posiciones, luego se abren con contraer y relajar, luego se vuelven activas, y se cierra encadenándolas y midiendo cuánto rango ganaste.</p>
+        </div>
+        <div class="timeline" id="timelineGrid"></div>
+      </div>
+
+      <div class="subsection" id="semana">
+        <div class="section-head">
+          <div class="section-kicker">Plantilla semanal</div>
+          <h2>Estructura de la semana</h2>
+          <p class="desc">Los cuatro días que declaraste en tu ficha: lunes, miércoles, jueves y viernes, de 45–60 minutos. Son cuatro sesiones distintas (A, B, C y D), de 6 ejercicios cada una, y cada una empieza con 5–8 minutos de entrada en calor. Miércoles, jueves y viernes van seguidos sin problema: cada día trabaja una zona distinta, y la movilidad tolera bien la frecuencia alta — de hecho, es lo que mejor le sirve. Se repite todas las semanas; solo cambia el contenido según el bloque. El «Día 1» del programa es un lunes: si empiezas otro día, corre el calendario completo, no solo esa sesión.</p>
+        </div>
+        <div class="week-grid" id="weekGrid"></div>
+      </div>
+
+      <div class="subsection" id="bloque-1"><div id="blockMount-1"></div></div>
+      <div class="subsection" id="bloque-2"><div id="blockMount-2"></div></div>
+      <div class="subsection" id="bloque-3"><div id="blockMount-3"></div></div>
+      <div class="subsection" id="bloque-4"><div id="blockMount-4"></div></div>
+
+      <div class="subsection" id="movilidad">
+        <div class="section-head">
+          <span class="chip chip-movilidad" style="margin-bottom:10px;">Entrada en calor</span>
+          <h2>Antes de cada sesión (5–8 min)</h2>
+          <p class="desc">Se mantiene igual en los 4 bloques. Son movimientos suaves, sin sostener: el objetivo es subir la temperatura del cuerpo y pasar cada articulación por su rango cómodo antes de ir a las posiciones del día. Un músculo en frío se estira peor y se queja más.</p>
+        </div>
+        <div class="tbl-scroll">
+          <table>
+            <thead><tr><th>Bloque</th><th>Ejercicio</th><th>Dosis</th><th>Foco</th></tr></thead>
+            <tbody id="mobilityTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="subsection" id="seguridad">
+        <div class="section-head">
+          <div class="section-kicker">Cómo entrenar bien y con calma</div>
+          <h2>Seguridad</h2>
+        </div>
+        <div class="card panel">
+          <ul class="plain">
+            <li><strong>Tensión, no dolor.</strong> La posición correcta está en un 6 o 7 de 10. Un dolor punzante, un pinchazo o un hormigueo no son tensión: sal de la posición despacio y prueba un nivel más fácil.</li>
+            <li><strong>Respira largo.</strong> Exhala al entrar en la posición y en cada exhalación suelta un poco más. Si te sorprendes aguantando el aire, fuiste muy lejos.</li>
+            <li><strong>Nunca rebotes.</strong> Se llega y se sostiene, o se entra y sale lento. El rebote activa el reflejo que cierra el rango.</li>
+            <li><strong>Entra en calor primero.</strong> Los 5–8 minutos de la tabla de arriba no son opcionales: son los que hacen que el resto de la sesión rinda.</li>
+            <li>Las semanas de deload (8 y 20) son parte del plan: la mitad de las series, misma calidad. El rango se consolida ahí.</li>
+            <li>Haz las cuatro pruebas de medición en las semanas 1, 8, 12, 20 y 24, siempre después de la misma entrada en calor, y anótalas en el Registro.</li>
+            <li>Si aparece dolor que no cede o mareo que no pasa, detén la sesión y coméntalo con el relator.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="subsection" id="registro">
+        <div class="section-head">
+          <div class="section-kicker">Seguimiento</div>
+          <h2>Registro de progreso</h2>
+          <p class="desc">Tablas para completar a mano — útil para imprimir.</p>
+        </div>
+        <div class="grid-2">
+          <div class="card panel">
+            <h4 style="font-size:14px; margin-bottom:10px;">Nivel alcanzado, por semana de medición</h4>
+            <div class="tbl-scroll">
+              <table>
+                <thead><tr><th>Ejercicio</th><th class="num">S1</th><th class="num">S8</th><th class="num">S12</th><th class="num">S20</th><th class="num">S24</th></tr></thead>
+                <tbody id="rmLogTable"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card panel">
+            <h4 style="font-size:14px; margin-bottom:10px;">Tus cuatro mediciones</h4>
+            <div class="tbl-scroll">
+              <table>
+                <thead><tr><th>Prueba</th><th class="num">S1</th><th class="num">S8</th><th class="num">S12</th><th class="num">S20</th><th class="num">S24</th></tr></thead>
+                <tbody>
+                  <tr><td>Plegado de pie: distancia de los dedos al suelo (cm; negativo si pasas del suelo)</td><td class="num"></td><td class="num"></td><td class="num"></td><td class="num"></td><td class="num"></td></tr>
+                  <tr><td>Rodilla a la pared: distancia del dedo gordo a la pared (cm, cada pie)</td><td class="num"></td><td class="num"></td><td class="num"></td><td class="num"></td><td class="num"></td></tr>
+                  <tr><td>Manos en la espalda (una por arriba, otra por abajo): distancia entre los dedos (cm, cada lado)</td><td class="num"></td><td class="num"></td><td class="num"></td><td class="num"></td><td class="num"></td></tr>
+                  <tr><td>Sentadilla profunda con talones abajo: segundos que la sostienes cómoda</td><td class="num"></td><td class="num"></td><td class="num"></td><td class="num"></td><td class="num"></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p class="credit">Taller de Entrenamiento Funcional · Prof. Diego Poblete Valdés · Generado 23 sep 2026</p>
+    </div>
+  </section>
+
+  <!-- ============ TAB: EJERCICIOS ============ -->
+  <section class="tab-panel" data-tab="ejercicios" id="panel-ejercicios">
+    <div class="wrap" style="padding-top:24px;">
+      <div class="section-head">
+        <div class="section-kicker">Referencia técnica</div>
+        <h2>Biblioteca de ejercicios</h2>
+        <p class="desc">Los 18 ejercicios del programa, con las señales técnicas clave. Cada tarjeta tiene su botón «Ver video» para revisar la ejecución.</p>
+      </div>
+      <div class="exlib-grid" id="exLibraryGrid"></div>
+    </div>
+  </section>
+
+</main>
+
+<nav class="tabbar" id="tabbar">
+  <button data-tab-btn="hoy" class="is-active" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9"/></svg>
+    <span>Hoy</span><span class="ind"></span>
+  </button>
+  <button data-tab-btn="rm" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="0.8" fill="currentColor"/></svg>
+    <span>Mi progreso</span><span class="ind"></span>
+  </button>
+  <button data-tab-btn="plan" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="14" y2="17"/></svg>
+    <span>Plan completo</span><span class="ind"></span>
+  </button>
+  <button data-tab-btn="ejercicios" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1.4"/><rect x="13" y="4" width="7" height="7" rx="1.4"/><rect x="4" y="13" width="7" height="7" rx="1.4"/><rect x="13" y="13" width="7" height="7" rx="1.4"/></svg>
+    <span>Ejercicios</span><span class="ind"></span>
+  </button>
+</nav>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ================= DATA ================= */
+  // Plan solo de movilidad: la ficha marca una única cualidad (flexibilidad y
+  // movilidad) y ninguna zona F/H. Las cuatro sesiones son días "gym" del
+  // MOTOR (tarjetas por nivel vía bw{}), no días "casa": el día "casa" del
+  // MOTOR siempre muestra cardio, y esta ficha no lo marcó. Sin día "casa",
+  // HOME_DAY_WARNING se define porque el MOTOR lo referencia, pero no se
+  // renderiza. CARDIO queda vacío y su sección no existe (INIT no llama
+  // renderCardio). MOBILITY es la entrada en calor de cada sesión.
+  var HOME_DAY_WARNING = { title:"La entrada en calor también entrena", text:"Cinco a ocho minutos de movimiento suave antes de las posiciones del día." };
+
+  // Texto y comportamiento propios de este plan que el MOTOR compartido lee
+  // en vez de tener hardcodeado — ver docs/superpowers/plans/2026-09-09-motor-modularizado.md.
+  var COPY = {
+    chipGym: "Movilidad", chipHome: "Movilidad",
+    ladderEmptyMsg: "Progresa por nivel: posición, tiempo y herramienta. La dosis exacta de tu nivel actual aparece en la pestaña Hoy.",
+    rmLogTracks: "bw",
+    retestTitle: "Semana de medición",
+    retestMsgWithLevels: function(blockId, atras){ return 'Haz tus cuatro mediciones después de la entrada en calor y anótalas en «Plan completo» → Registro. El plan ya propone nivel '+blockId+' en '+atras.join(", ")+': si llegas a esa posición sin dolor y respirando parejo, sube de nivel en «Mi progreso».'; },
+    retestMsgNoLevels: function(){ return 'Haz tus cuatro mediciones después de la entrada en calor y anótalas en «Plan completo» → Registro, y revisa en «Mi progreso» en qué nivel estás en cada ejercicio.'; },
+    cardioOptional: false,
+    safetyFlagWarnGlyph: false,
+    homeWarningClass: "callout-accent",
+    homeWarningGlyph: false
+  };
+
+  // Id del plan, no el nombre: este archivo se publica y el prefijo queda a la vista.
+  var STORAGE_NS = "p980676_";
+
+  var SAFETY_MESSAGES = {
+    columna: { title:"La espalda se mueve por segmentos", text:"En los ejercicios que doblan o arquean la espalda, busca que se mueva vértebra por vértebra, sin colgarte de la zona que ya se dobla fácil (casi siempre la espalda baja). Si una zona pellizca en vez de estirar, achica el rango ahí." }
+  };
+
+  var EXERCISES = {
+    /* ---------- Día A (lunes): cadera y cadena posterior ---------- */
+    hamstring:{ name:"Isquiotibiales boca arriba con banda", en:"Supine Hamstring Stretch with Band", patron:"Flexión de cadera con rodilla estirada", musculos:"Isquiotibiales, pantorrilla", icon:"hinge", loaded:false,
+      cues:["Boca arriba, banda en la planta del pie, pierna estirada hacia el techo","La otra pierna estirada en el suelo (o doblada, si la espalda baja se despega)","Lleva la pierna hacia ti con la banda hasta el 6 de 10 de tensión, sin doblar la rodilla","Contraer y relajar: empuja el pie contra la banda 5 seg sin moverte, suelta, y avanza un poco en la exhalación"],
+      bw:{1:{sets:2,variante:"Estático con banda",dosis:"30 seg por pierna"}, 2:{sets:3,variante:"Contraer y relajar con banda",dosis:"3 ciclos de 5 seg de empuje + 10 seg de avance, por pierna"}, 3:{sets:3,variante:"Rango activo: sube la pierna sin banda y sostén",dosis:"5 subidas de 3 seg arriba por pierna"}, 4:{sets:3,variante:"Contraer y relajar + 5 subidas activas al terminar",dosis:"por pierna"}} },
+    hipflexor:{ name:"Flexor de cadera en zancada baja", en:"Half-Kneeling Hip Flexor Stretch", patron:"Extensión de cadera (estiramiento)", musculos:"Psoas, recto femoral", icon:"hipext", loaded:false,
+      cues:["Una rodilla en el suelo (sobre una toalla doblada), el otro pie adelante","Aprieta el glúteo de la pierna de atrás y mete la pelvis — ahí empieza el estiramiento, antes de avanzar","Avanza la cadera sin arquear la espalda baja","El brazo del lado de atrás arriba agrega la parte alta del músculo"],
+      bw:{1:{sets:2,variante:"Zancada baja, glúteo apretado",dosis:"30 seg por lado"}, 2:{sets:3,variante:"Con brazo arriba, contraer y relajar (empuja la rodilla contra el suelo 5 seg)",dosis:"3 ciclos por lado"}, 3:{sets:3,variante:"Pie de atrás en la pared o el sillón (couch stretch)",dosis:"30–45 seg por lado"}, 4:{sets:3,variante:"Couch stretch con 5 contracciones de glúteo de 5 seg",dosis:"por lado"}} },
+    hip9090:  { name:"Rotaciones de cadera 90/90", en:"90/90 Hip Switch", patron:"Rotación de cadera", musculos:"Rotadores de cadera, glúteo medio", icon:"hinge", loaded:false,
+      cues:["En el suelo, una pierna doblada adelante y la otra al lado, las dos rodillas en 90°","Cambia de lado girando las rodillas juntas, con el pecho alto","Si la espalda se cae hacia atrás, apoya las manos detrás","Al final de cada lado, inclina el pecho sobre la pierna de adelante y respira"],
+      bw:{1:{sets:2,variante:"Con las manos apoyadas atrás",dosis:"8 cambios por lado"}, 2:{sets:3,variante:"Con las manos apoyadas atrás + 20 seg con el pecho sobre la pierna de adelante",dosis:"6 cambios por lado"}, 3:{sets:3,variante:"Sin manos, pecho alto",dosis:"8 cambios por lado"}, 4:{sets:3,variante:"Sin manos, levantando la rodilla de atrás 3 seg en cada lado",dosis:"6 cambios por lado"}} },
+    frog:     { name:"Aductores en rana", en:"Frog Stretch", patron:"Abducción de cadera (estiramiento)", musculos:"Aductores", icon:"hipadduct", loaded:false,
+      cues:["En cuadrupedia sobre antebrazos, abre las rodillas hacia los lados (con toalla debajo) y deja los tobillos en línea con las rodillas","Lleva la cadera hacia atrás despacio, con la espalda neutra","El rango lo marca la ingle: tensión en el interior del muslo, nunca en la rodilla","Contraer y relajar: aprieta las rodillas hacia el suelo 5 seg, suelta y deja que la cadera se vaya un poco más atrás"],
+      bw:{1:{sets:2,variante:"Rodillas poco abiertas",dosis:"30 seg"}, 2:{sets:3,variante:"Contraer y relajar",dosis:"3 ciclos de 5 seg"}, 3:{sets:3,variante:"Rodillas más abiertas, balanceo lento adelante-atrás",dosis:"10 balanceos + 20 seg abajo"}, 4:{sets:3,variante:"Rodillas abiertas, contraer y relajar + balanceo",dosis:"3 ciclos + 10 balanceos"}} },
+    pigeon:   { name:"Glúteo en paloma", en:"Pigeon Stretch", patron:"Rotación externa de cadera (estiramiento)", musculos:"Glúteo mayor y medio, piriforme", icon:"hipext", loaded:false,
+      cues:["Una pierna doblada adelante y la otra estirada atrás; si la rodilla de adelante molesta, hazlo boca arriba con el tobillo sobre la rodilla contraria (figura 4)","Cadera cuadrada al frente, sin caerte hacia el lado de la pierna doblada","Inclina el pecho hacia adelante con la espalda larga","Respira hacia el glúteo: se va soltando en la exhalación"],
+      bw:{1:{sets:2,variante:"Figura 4 boca arriba",dosis:"30–40 seg por lado"}, 2:{sets:3,variante:"Paloma con el pecho alto",dosis:"30–40 seg por lado"}, 3:{sets:3,variante:"Paloma con el pecho inclinado",dosis:"45 seg por lado"}, 4:{sets:3,variante:"Paloma inclinada + contraer y relajar (empuja la rodilla contra el suelo)",dosis:"3 ciclos por lado"}} },
+    squathold:{ name:"Sentadilla profunda sostenida", en:"Deep Squat Hold", patron:"Rodilla y cadera (rango final)", musculos:"Cadera, tobillo, aductores", icon:"squat", loaded:false,
+      cues:["Pies algo más abiertos que los hombros, puntas levemente hacia afuera","Baja lo más profundo que puedas con los talones en el suelo; si no llegan, un libro bajo los talones","Codos por dentro de las rodillas, empujándolas suavemente hacia afuera","Pecho alto y respiración larga. Es también una de tus cuatro mediciones"],
+      bw:{1:{sets:3,variante:"Con las manos en un marco de puerta o un mueble firme",dosis:"20–30 seg"}, 2:{sets:3,variante:"Sin apoyo, talones abajo (o sobre un libro)",dosis:"30 seg"}, 3:{sets:3,variante:"Sin apoyo, con cambio de peso lento de un pie al otro",dosis:"45 seg"}, 4:{sets:3,variante:"Sin apoyo, brazos arriba",dosis:"45–60 seg"}} },
+
+    /* ---------- Día B (miércoles): columna y hombro ---------- */
+    catcamel: { name:"Gato-camello segmentado", en:"Segmental Cat-Cow", patron:"Flexión y extensión de columna", musculos:"Columna completa", icon:"core", loaded:false, safety:"columna",
+      cues:["En cuadrupedia, manos bajo los hombros y rodillas bajo la cadera","Redondea empezando por la pelvis y subiendo vértebra por vértebra hasta la cabeza","Vuelve al arco empezando otra vez por la pelvis","Lento: una repetición dura lo que tres respiraciones"],
+      bw:{1:{sets:2,variante:"Rango cómodo",dosis:"8 reps"}, 2:{sets:2,variante:"Segmentado, lento",dosis:"8 reps"}, 3:{sets:3,variante:"Segmentado, con 3 seg de pausa en cada extremo",dosis:"6 reps"}, 4:{sets:3,variante:"Segmentado + círculos de columna en cuadrupedia",dosis:"6 reps + 4 círculos por lado"}} },
+    tspine:   { name:"Rotación torácica: libro abierto", en:"Open Book Thoracic Rotation", patron:"Rotación de columna torácica", musculos:"Columna torácica, pectoral", icon:"core", loaded:false,
+      cues:["De lado, rodillas dobladas a 90° y apoyadas una sobre la otra, brazos estirados adelante","Abre el brazo de arriba como la tapa de un libro, siguiendo la mano con la mirada","Las rodillas no se separan: el giro viene del pecho, no de la cadera","Exhala al abrir y quédate un momento en el final"],
+      bw:{1:{sets:2,variante:"Rango cómodo",dosis:"8 por lado"}, 2:{sets:3,variante:"Con 5 seg de pausa abierta",dosis:"6 por lado"}, 3:{sets:3,variante:"En cuadrupedia, mano en la nuca",dosis:"8 por lado, pausa de 3 seg arriba"}, 4:{sets:3,variante:"En cuadrupedia, brazo estirado hacia el techo",dosis:"8 por lado, pausa de 3 seg arriba"}} },
+    dislocate:{ name:"Pasadas de hombro con banda", en:"Band Shoulder Pass-Through", patron:"Flexión y extensión de hombro", musculos:"Hombro, pectoral, dorsal", icon:"pushv", loaded:false,
+      cues:["De pie, banda tomada con las manos bien separadas y los brazos estirados","Pasa la banda por encima de la cabeza hasta atrás y vuelve, sin doblar los codos","Costillas abajo: el que se mueve es el hombro, no la espalda baja que se arquea","Cada semana acerca un poco las manos — ese es tu progreso"],
+      bw:{1:{sets:2,variante:"Banda suave, manos muy separadas",dosis:"10 pasadas"}, 2:{sets:3,variante:"Manos un poco más juntas",dosis:"10 pasadas"}, 3:{sets:3,variante:"Manos más juntas, 2 seg de pausa atrás",dosis:"8 pasadas"}, 4:{sets:3,variante:"Manos más juntas, bajada lenta de 4 seg",dosis:"8 pasadas"}} },
+    wallslide:{ name:"Deslizamientos de brazos en la pared", en:"Wall Slides", patron:"Flexión de hombro activa", musculos:"Serrato, trapecio inferior, hombro", icon:"pullv", loaded:false,
+      cues:["Espalda, cabeza y glúteo apoyados en la pared, pies a un paso de ella","Brazos en W contra la pared (codos y dorsos de las manos tocando si puedes)","Desliza los brazos hacia arriba sin que la espalda baja se despegue","Baja llevando los codos hacia los bolsillos"],
+      bw:{1:{sets:2,variante:"De frente a la pared, antebrazos apoyados",dosis:"10 reps"}, 2:{sets:3,variante:"De espalda a la pared, rango cómodo",dosis:"10 reps"}, 3:{sets:3,variante:"De espalda a la pared, rango completo, 3 seg arriba",dosis:"8 reps"}, 4:{sets:3,variante:"Brazos separados 2 cm de la pared arriba, 3 seg",dosis:"8 reps"}} },
+    pecstretch:{ name:"Pectoral en el marco de la puerta", en:"Doorway Pec Stretch", patron:"Abducción horizontal de hombro (estiramiento)", musculos:"Pectoral mayor y menor", icon:"pushh", loaded:false,
+      cues:["Antebrazo apoyado en el marco, codo a la altura del hombro","Da un paso adelante con el pie del mismo lado hasta sentir el pecho, no el hombro","Hombro abajo y lejos de la oreja","Contraer y relajar: empuja el antebrazo contra el marco 5 seg, suelta y avanza"],
+      bw:{1:{sets:2,variante:"Estático, codo a la altura del hombro",dosis:"30 seg por lado"}, 2:{sets:3,variante:"Contraer y relajar",dosis:"3 ciclos por lado"}, 3:{sets:3,variante:"Dos alturas: codo al hombro y codo más arriba",dosis:"30 seg cada una, por lado"}, 4:{sets:3,variante:"Rango activo: separa el antebrazo 2 cm del marco y sostén",dosis:"5 x 5 seg por lado"}} },
+    wristprep:{ name:"Movilidad de muñecas en cuadrupedia", en:"Wrist Mobility on All Fours", patron:"Flexión y extensión de muñeca", musculos:"Flexores y extensores del antebrazo", icon:"wrist", loaded:false,
+      cues:["En cuadrupedia, dedos hacia adelante","Balancea el peso hacia adelante y atrás sobre las palmas, sin despegarlas","Luego dedos hacia las rodillas, y luego dorsos de las manos en el suelo","Tensión suave: las muñecas se preparan, no se fuerzan"],
+      bw:{1:{sets:1,variante:"Dedos adelante y hacia las rodillas",dosis:"10 balanceos en cada posición"}, 2:{sets:2,variante:"Tres posiciones (dedos adelante, atrás, dorsos)",dosis:"10 balanceos en cada una"}, 3:{sets:2,variante:"Tres posiciones con 5 seg de pausa al final",dosis:"8 balanceos en cada una"}, 4:{sets:2,variante:"Tres posiciones + círculos de muñeca",dosis:"8 balanceos + 8 círculos"}} },
+
+    /* ---------- Día C (jueves): tobillo y cadera de pie ---------- */
+    ankle:    { name:"Rodilla a la pared", en:"Knee-to-Wall Ankle Mobilization", patron:"Dorsiflexión de tobillo", musculos:"Tobillo, sóleo", icon:"calf", loaded:false,
+      cues:["De frente a la pared, un pie a unos centímetros, la otra pierna atrás","Lleva la rodilla a tocar la pared sin despegar el talón","La rodilla va en línea con el segundo dedo, no hacia adentro","Cuando toques fácil, aleja el pie un poco. Es también una de tus mediciones"],
+      bw:{1:{sets:2,variante:"Pie cerca de la pared",dosis:"10 toques por pie"}, 2:{sets:3,variante:"Pie más lejos, 3 seg en el final",dosis:"8 toques por pie"}, 3:{sets:3,variante:"Pie en el límite, 5 seg en el final",dosis:"8 toques por pie"}, 4:{sets:3,variante:"Pie en el límite + elevación de talón al volver",dosis:"8 por pie"}} },
+    cossack:  { name:"Sentadilla cosaca", en:"Cossack Squat", patron:"Aducción de cadera (rango lateral)", musculos:"Aductores, cadera, tobillo", icon:"hipadduct", loaded:false,
+      cues:["Pies muy separados, puntas levemente hacia afuera","Baja hacia un lado doblando esa rodilla, con la otra pierna estirada y la punta mirando al techo","Talón de la pierna doblada en el suelo, pecho alto","Pasa de un lado al otro sin subir del todo, lento"],
+      bw:{1:{sets:2,variante:"Con una mano en un mueble, rango corto",dosis:"6 por lado"}, 2:{sets:3,variante:"Con una mano en un mueble, más profundo",dosis:"6 por lado"}, 3:{sets:3,variante:"Sin apoyo",dosis:"6 por lado, 3 seg abajo"}, 4:{sets:3,variante:"Sin apoyo, cambio de lado sin subir",dosis:"8 por lado"}} },
+    quad:     { name:"Cuádriceps de lado en el suelo", en:"Side-Lying Quad Stretch", patron:"Flexión de rodilla con extensión de cadera", musculos:"Cuádriceps, flexor de cadera", icon:"hipext", loaded:false,
+      cues:["De lado en el suelo, rodilla de abajo doblada hacia el pecho (protege la espalda baja)","Toma el tobillo de arriba y lleva el talón hacia el glúteo","Rodilla de arriba hacia atrás, en línea con la cadera — no hacia adelante","Si no alcanzas el tobillo, usa la banda"],
+      bw:{1:{sets:2,variante:"Con banda si hace falta",dosis:"30 seg por lado"}, 2:{sets:3,variante:"Contraer y relajar (empuja el pie contra la mano 5 seg)",dosis:"3 ciclos por lado"}, 3:{sets:3,variante:"Rodilla más atrás de la línea de la cadera",dosis:"40 seg por lado"}, 4:{sets:3,variante:"Rodilla atrás + contraer y relajar",dosis:"3 ciclos por lado"}} },
+
+    /* ---------- Día D (viernes): integración ---------- */
+    pancake:  { name:"Pancake con piernas abiertas", en:"Seated Straddle (Pancake)", patron:"Flexión de cadera con abducción", musculos:"Isquiotibiales, aductores", icon:"hinge", loaded:false,
+      cues:["En el suelo, piernas abiertas lo que vaya cómodo, rodillas estiradas y rótulas mirando al techo","Si la espalda se redondea, siéntate sobre un cojín","Inclínate adelante desde la cadera, con el pecho largo","La meta es la cadera, no llegar con la cabeza al suelo"],
+      bw:{1:{sets:2,variante:"Sobre un cojín, manos apoyadas adelante",dosis:"30–40 seg"}, 2:{sets:3,variante:"Contraer y relajar (empuja los talones contra el suelo 5 seg)",dosis:"3 ciclos"}, 3:{sets:3,variante:"Piernas más abiertas, con inclinación hacia cada pierna",dosis:"30 seg centro + 20 seg a cada lado"}, 4:{sets:3,variante:"Con el pecho adelante, levanta las manos del suelo 3 seg",dosis:"5 levantadas"}} },
+    activeslr:{ name:"Elevación activa de pierna estirada", en:"Active Straight Leg Raise", patron:"Flexión de cadera activa", musculos:"Flexores de cadera, isquiotibiales", icon:"hinge", loaded:false,
+      cues:["Boca arriba, piernas estiradas, espalda baja apoyada","Sube una pierna estirada lo más alto que puedas sin ayuda de las manos","La otra pierna se queda pegada al suelo, sin doblar la rodilla","Esto es rango activo puro: lo que subes acá es rango que ya es tuyo"],
+      bw:{1:{sets:2,variante:"Rango cómodo",dosis:"8 por pierna"}, 2:{sets:3,variante:"Con 2 seg arriba",dosis:"8 por pierna"}, 3:{sets:3,variante:"Con banda suave en el tobillo",dosis:"8 por pierna, 2 seg arriba"}, 4:{sets:3,variante:"Con banda media en el tobillo",dosis:"8 por pierna, 3 seg arriba"}} },
+    bridge:   { name:"Puente de columna progresivo", en:"Back Bridge Progression", patron:"Extensión de columna y cadera", musculos:"Columna, flexores de cadera, hombro", icon:"hipext", loaded:false, safety:"columna",
+      cues:["Empieza con un puente de glúteo: boca arriba, rodillas dobladas, sube la cadera","Estira los brazos hacia atrás por encima de la cabeza en el suelo mientras subes: abre el pecho","El arco se reparte en toda la espalda, no solo en la zona baja","Solo pasa a apoyar las manos si los niveles anteriores salen sin molestias"],
+      bw:{1:{sets:2,variante:"Puente de glúteo con brazos atrás en el suelo",dosis:"8 reps, 3 seg arriba"}, 2:{sets:3,variante:"Puente con el pecho abierto hacia la cabeza",dosis:"8 reps, 5 seg arriba"}, 3:{sets:3,variante:"Puente de hombros sobre un sillón, brazos atrás",dosis:"20 seg"}, 4:{sets:3,variante:"Manos apoyadas junto a las orejas, solo subir la cabeza del suelo",dosis:"5 x 5 seg"}} }
+  };
+
+  function dayFull(){
+    // Ningún ejercicio usa ladder por %1RM (ficha: peso corporal + bandas, sin
+    // zonas F/H). Todos progresan por nivel vía bw{}. 6 ejercicios por día: la
+    // ficha marca 45-60 min por sesión (spec §4.6), con 5-8 min de entrada en
+    // calor (MOBILITY) antes.
+    var buildA = function(){ return [
+      {id:"hamstring", ladder:null}, {id:"hipflexor", ladder:null}, {id:"hip9090", ladder:null},
+      {id:"frog", ladder:null}, {id:"pigeon", ladder:null}, {id:"squathold", ladder:null}
+    ]; };
+    var buildB = function(){ return [
+      {id:"catcamel", ladder:null}, {id:"tspine", ladder:null}, {id:"dislocate", ladder:null},
+      {id:"wallslide", ladder:null}, {id:"pecstretch", ladder:null}, {id:"wristprep", ladder:null}
+    ]; };
+    var buildC = function(){ return [
+      {id:"ankle", ladder:null}, {id:"cossack", ladder:null}, {id:"quad", ladder:null},
+      {id:"hip9090", ladder:null}, {id:"squathold", ladder:null}, {id:"tspine", ladder:null}
+    ]; };
+    var buildD = function(){ return [
+      {id:"catcamel", ladder:null}, {id:"pancake", ladder:null}, {id:"activeslr", ladder:null},
+      {id:"bridge", ladder:null}, {id:"wallslide", ladder:null}, {id:"hamstring", ladder:null}
+    ]; };
+    return {A:buildA, B:buildB, C:buildC, D:buildD};
+  }
+  var DF = dayFull();
+
+  /* ================================================================
+     DATOS DEL ESTUDIANTE — esto es lo único que cambia entre planes:
+     desde aquí hasta el marcador MOTOR más abajo (SAFETY_MESSAGES,
+     EXERCISES, dayFull(), BLOCKS, MOBILITY, CARDIO, HOME_DAY_WARNING,
+     STORAGE_NS inclusive). Ficha: v5, 22 sep 2026. Ver
+     docs/superpowers/specs/2026-09-02-plan-entrenamiento-plantilla-design.md §3–4.
+     ================================================================ */
+
+  function diasBloque(tag){
+    return [
+      {id:"A1", weekday:"Lunes", short:"Movilidad A · cadera", ladderTag:"progresion", nombre:"Lunes · Movilidad A (cadera y cadena posterior)"+tag, ej:DF.A()},
+      {id:"B1", weekday:"Miércoles", short:"Movilidad B · columna y hombro", ladderTag:"progresion", nombre:"Miércoles · Movilidad B (columna y hombro)"+tag, ej:DF.B()},
+      {id:"C1", weekday:"Jueves", short:"Movilidad C · tobillo y cadera", ladderTag:"progresion", nombre:"Jueves · Movilidad C (tobillo y cadera de pie)"+tag, ej:DF.C()},
+      {id:"D1", weekday:"Viernes", short:"Movilidad D · integración", ladderTag:"progresion", nombre:"Viernes · Movilidad D (integración)"+tag, ej:DF.D()}
+    ];
+  }
+
+  var BLOCKS = [
+    { id:1, key:"acumulacion", nombre:"Posiciones", sub:"Estático y técnica", weeks:"Semanas 1–8", weekStart:1, weekEnd:8, color:"amber",
+      resumen:"Base de posiciones. Cada ejercicio entra en su versión estática: llegar, respirar largo, sostener. Lo que se busca estas ocho semanas es aprender dónde se siente cada posición y en qué punto está tu 6 de 10 de tensión. Semana 1: primera medición. Semana 8: deload (la mitad de las series) y medición.",
+      progresion:"Si llegas a la posición del nivel siguiente sin dolor y respirando parejo en dos sesiones seguidas, sube de nivel en «Mi progreso». Si tira de más, quédate — no es un retroceso, es cómo funciona el método.",
+      dias:diasBloque("") },
+    { id:2, key:"transicion", nombre:"Contraer y relajar", sub:"El rango se abre", weeks:"Semanas 9–12", weekStart:9, weekEnd:12, color:"violet",
+      resumen:"Entra la herramienta que más rápido abre rango: en la posición, empujas contra la banda o el suelo 5 segundos sin moverte, sueltas, y avanzas un poco en la exhalación. El músculo que se acaba de contraer se deja alargar más. Semana 12: medición.",
+      progresion:"Misma regla del Bloque 1. En contraer y relajar, el empuje es firme pero no máximo (un 5 de 10): se busca soltar, no ganar una pulseada.",
+      dias:diasBloque(" — contraer y relajar") },
+    { id:3, key:"especializacion", nombre:"Rango activo", sub:"El rango se vuelve tuyo", weeks:"Semanas 13–20", weekStart:13, weekEnd:20, color:"accent",
+      resumen:"El paso que hace que lo ganado no se pierda: llegar al rango y sostenerlo con tu propio músculo, sin la mano ni la banda. Aparecen las elevaciones activas, las pausas en el final del rango y las versiones sin apoyo. Es también donde el cuerpo aprende a controlar lo que ya puede alcanzar. Semana 20: deload y medición.",
+      progresion:"Cuando la versión activa sale limpia y respirando en dos sesiones seguidas, sube de nivel. Prioriza sostener bien un rango menor por sobre alcanzar uno mayor sin control.",
+      dias:diasBloque(" — rango activo") },
+    { id:4, key:"integracion", nombre:"Integración", sub:"Consolidar y medir", weeks:"Semanas 21–24", weekStart:21, weekEnd:24, color:"teal",
+      resumen:"Se combinan las herramientas y las posiciones se encadenan en movimiento: contraer y relajar para abrir, rango activo para cerrar. La semana 24 es la última medición — compárala con la semana 1 y conversa con el relator qué quieres entrenar en el ciclo siguiente.",
+      progresion:"Sin saltos de nivel en la semana 24: es semana de medición, no de progresión. En el resto del bloque, mantén el nivel que ya dominas y busca que la última serie se vea igual de suelta que la primera.",
+      dias:diasBloque(" — integración") }
+  ];
+
+  var DELOAD_WEEKS = [8,20];
+  var RETEST_WEEKS = [1,8,12,20,24];
+
+  // Única fuente de verdad del calendario semanal: slot "A"/"B"/"C"/"D" + occ
+  // referencian el id del día del bloque activo (ver BLOCKS más arriba).
+  // resolveSession() lee esto directamente — no hay una segunda copia
+  // hardcodeada en el motor.
+  // Ficha: 4 días/semana, 45–60 min, prefiere lunes, miércoles, jueves y viernes.
+  var WEEK_TEMPLATE = [
+    {num:"Lunes",     name:"Movilidad A · cadera y cadena posterior", tag:"gym", slot:"A", occ:1},
+    {num:"Martes",    name:"Descanso", tag:"rest", slot:null, occ:null},
+    {num:"Miércoles", name:"Movilidad B · columna y hombro", tag:"gym", slot:"B", occ:1},
+    {num:"Jueves",    name:"Movilidad C · tobillo y cadera de pie", tag:"gym", slot:"C", occ:1},
+    {num:"Viernes",   name:"Movilidad D · integración", tag:"gym", slot:"D", occ:1},
+    {num:"Sábado",    name:"Descanso", tag:"rest", slot:null, occ:null},
+    {num:"Domingo",   name:"Descanso", tag:"rest", slot:null, occ:null}
+  ];
+
+  // Entrada en calor de cada sesión (5-8 min), no una rutina aparte.
+  var MOBILITY = [
+    ["Todos","Marcha en el lugar subiendo rodillas","1 min","Temperatura"],
+    ["Todos","Círculos de cuello, hombros, cadera y tobillos","5 por lado c/u","Todas las articulaciones"],
+    ["Todos","Balanceo de piernas adelante-atrás y de lado, con una mano en la pared","10 por pierna c/u","Cadera"],
+    ["Todos","Gato-camello rápido y suave","8 reps","Columna"],
+    ["Todos","Sentadilla lenta al rango cómodo","8 reps","Cadera, rodilla y tobillo"],
+    ["Bloque 3–4","Gusano (inchworm): manos al suelo y caminar hasta plancha","5 reps","Cadena posterior y hombro"]
+  ];
+
+  // Sin resistencia aeróbica en la ficha: no hay protocolo de cardio (INIT no
+  // llama renderCardio y la sección no existe en Plan completo).
+  var CARDIO = [];
+
+  /* ================================================================
+     MOTOR — periodización, render y persistencia. No se toca al
+     crear un plan nuevo; se copia verbatim al archivo del siguiente
+     estudiante. Organizado en módulos con interfaz pública (patrón
+     revealing module) — ver
+     docs/superpowers/specs/2026-09-09-motor-modularizado-design.md.
+     ================================================================ */
+
+  var Icons = (function(){
+    var ICONS = {
+      squat:  '<circle cx="32" cy="10" r="6"/><path d="M32 16 L30 30"/><path d="M30 30 L18 40 L18 52"/><path d="M30 30 L40 40 L40 52"/><path d="M32 16 L20 24"/><path d="M32 16 L44 24"/><line x1="8" y1="56" x2="56" y2="56"/>',
+      hinge:  '<circle cx="18" cy="12" r="6"/><path d="M18 18 L36 32"/><path d="M36 32 L36 52"/><path d="M36 32 L20 38"/><line x1="10" y1="38" x2="18" y2="38" stroke-width="5"/><line x1="8" y1="56" x2="56" y2="56"/>',
+      pushh:  '<circle cx="12" cy="30" r="6"/><line x1="18" y1="30" x2="50" y2="30"/><path d="M28 30 L28 16"/><path d="M38 30 L38 16"/><line x1="22" y1="16" x2="44" y2="16" stroke-width="5"/><line x1="8" y1="44" x2="56" y2="44"/>',
+      pullh:  '<circle cx="44" cy="12" r="6"/><path d="M44 18 L26 32"/><path d="M26 32 L26 52"/><path d="M26 32 L14 52"/><path d="M30 28 L16 28"/><circle cx="14" cy="28" r="3.5"/><line x1="8" y1="56" x2="56" y2="56"/>',
+      pushv:  '<circle cx="28" cy="10" r="6"/><path d="M28 16 L28 38"/><path d="M28 38 L20 56"/><path d="M28 38 L34 56"/><path d="M28 20 L16 20 L16 8"/><path d="M28 20 L40 20 L40 8"/><circle cx="16" cy="6" r="4"/><circle cx="40" cy="6" r="4"/><path d="M50 34 L50 14"/><path d="M46 18 L50 14 L54 18"/>',
+      pullv:  '<circle cx="32" cy="10" r="6"/><path d="M32 16 L32 44"/><path d="M32 44 L22 54"/><path d="M32 44 L42 54"/><path d="M32 22 L18 30"/><path d="M32 22 L46 30"/><line x1="14" y1="30" x2="50" y2="30" stroke-width="5"/>',
+      hipext: '<circle cx="10" cy="36" r="6"/><path d="M10 42 L34 26"/><path d="M34 26 L46 44"/><path d="M46 44 L42 56"/><line x1="4" y1="42" x2="18" y2="42" stroke-width="5"/><line x1="24" y1="20" x2="44" y2="20" stroke-width="5"/><line x1="8" y1="56" x2="56" y2="56"/>',
+      hipadduct: '<circle cx="32" cy="10" r="6"/><path d="M32 16 L32 34"/><path d="M32 34 L18 54"/><path d="M32 34 L46 54"/><path d="M10 38 L18 38"/><path d="M14 34 L18 38 L14 42"/><path d="M54 38 L46 38"/><path d="M50 34 L46 38 L50 42"/><line x1="8" y1="56" x2="56" y2="56"/>',
+      curl:   '<circle cx="24" cy="10" r="6"/><path d="M24 16 L24 40"/><path d="M24 40 L18 56"/><path d="M24 40 L30 56"/><path d="M24 22 L40 26 L38 14"/><circle cx="38" cy="14" r="4"/><path d="M50 34 L50 18"/><path d="M46 22 L50 18 L54 22"/>',
+      tricep: '<circle cx="24" cy="10" r="6"/><path d="M24 16 L24 40"/><path d="M24 40 L18 56"/><path d="M24 40 L30 56"/><path d="M24 22 L24 32 L38 46"/><circle cx="38" cy="46" r="4"/><path d="M50 34 L50 48"/><path d="M46 44 L50 48 L54 44"/>',
+      wrist:  '<line x1="8" y1="44" x2="30" y2="44" stroke-width="5"/><circle cx="8" cy="44" r="4"/><path d="M30 44 L42 36"/><circle cx="42" cy="36" r="4"/><path d="M54 42 L54 28"/><path d="M50 32 L54 28 L58 32"/>',
+      shrug:  '<circle cx="28" cy="10" r="6"/><path d="M28 16 L28 40"/><path d="M28 40 L20 56"/><path d="M28 40 L36 56"/><path d="M28 20 L18 38"/><path d="M28 20 L38 38"/><circle cx="18" cy="38" r="4"/><circle cx="38" cy="38" r="4"/><path d="M14 20 L14 12"/><path d="M10 16 L14 12 L18 16"/><path d="M42 20 L42 12"/><path d="M38 16 L42 12 L46 16"/>',
+      core:   '<circle cx="10" cy="30" r="6"/><line x1="16" y1="32" x2="50" y2="40"/><path d="M16 32 L16 44"/><line x1="8" y1="46" x2="56" y2="46"/>',
+      calf:   '<circle cx="30" cy="10" r="6"/><path d="M30 16 L30 40"/><path d="M30 20 L22 30"/><path d="M30 20 L38 30"/><path d="M30 40 L30 48 L36 52"/><path d="M46 44 L46 32"/><path d="M42 36 L46 32 L50 36"/><line x1="8" y1="56" x2="56" y2="56"/>'
+    };
+    function svgIcon(name, cls){
+      return '<svg class="'+cls+'" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICONS[name]+'</svg>';
+    }
+    return { ICONS: ICONS, svgIcon: svgIcon };
+  })();
+
+  var Storage = (function(){
+    function lsGet(key){ try { return window.localStorage.getItem(STORAGE_NS+key); } catch(e){ return null; } }
+    function lsSet(key,val){ try { window.localStorage.setItem(STORAGE_NS+key,val); } catch(e){} }
+    function lsRemove(key){ try { window.localStorage.removeItem(STORAGE_NS+key); } catch(e){} }
+
+    // Migración de una sola vez: este plan usaba el nombre del estudiante como
+    // prefijo de guardado, y ese texto quedaba a la vista en el código publicado.
+    // Si queda progreso bajo el prefijo antiguo, se traslada al actual.
+    (function migrarPrefijoGuardado(){
+      try {
+        var ls = window.localStorage, claves = [], previos = [], i, m;
+        for(i=0; i<ls.length; i++) claves.push(ls.key(i));
+        for(i=0; i<claves.length; i++){
+          if(claves[i].indexOf(STORAGE_NS)===0) return; // ya migrado
+          m = claves[i].match(/^(.+?_)(plan_|oneRM_|chk_)/);
+          if(m && !/^p\d{6}_$/.test(m[1]) && previos.indexOf(m[1])===-1) previos.push(m[1]);
+        }
+        if(previos.length !== 1) return; // sin datos antiguos, o de más de un plan: no adivinar
+        for(i=0; i<claves.length; i++){
+          if(claves[i].indexOf(previos[0])===0)
+            ls.setItem(STORAGE_NS+claves[i].slice(previos[0].length), ls.getItem(claves[i]));
+        }
+      } catch(e){}
+    })();
+
+    return { lsGet: lsGet, lsSet: lsSet, lsRemove: lsRemove };
+  })();
+
+  var Schedule = (function(){
+    var TOTAL_PROGRAM_DAYS = 24 * 7; // 168 — one linear pointer through the whole program
+    function blockForWeek(w){
+      for(var i=0;i<BLOCKS.length;i++){ if(w>=BLOCKS[i].weekStart && w<=BLOCKS[i].weekEnd) return BLOCKS[i]; }
+      return BLOCKS[0];
+    }
+    function weekFromProgramDay(pd){ return Math.ceil(pd/7); }
+    function dowFromProgramDay(pd){ return ((pd-1)%7)+1; } // 1..7 within the training week
+    // Resolves which session happens on a given day-of-week within a given block.
+    // Lee el slot directamente de WEEK_TEMPLATE (dow 1-7) en vez de duplicar el
+    // calendario aquí — WEEK_TEMPLATE es la única fuente de verdad del día de la
+    // semana. Los bloques con 2 días usan ids "A"/"B"; los que tienen 3+ días
+    // (o repiten sesiones en la semana) usan slot+occ para desambiguar (ej. "A1","B1","C1").
+    function resolveSession(block, dow){
+      var tmpl = WEEK_TEMPLATE[dow-1];
+      if(tmpl.tag==="rest") return {type:"rest"};
+      if(tmpl.tag==="home") return {type:"casa"};
+      var dayId = (block.dias.length===2) ? tmpl.slot : (tmpl.slot+tmpl.occ);
+      var day = block.dias.filter(function(d){ return d.id===dayId; })[0];
+      return {type:"gym", day:day};
+    }
+    // Arma los 7 días (lunes→domingo) de la semana que contiene programDay,
+    // reutilizando resolveSession/WEEK_TEMPLATE — nunca una tabla nueva
+    // (ver comentario de resolveSession arriba). TOTAL_PROGRAM_DAYS=168=24×7
+    // exacto, así que ninguna semana cruza un límite de bloque a medio camino.
+    function weekCircleData(programDay){
+      var dow = dowFromProgramDay(programDay);
+      var weekStartPD = programDay - (dow - 1);
+      var days = [];
+      for(var i = 0; i < 7; i++){
+        var pd = weekStartPD + i;
+        var week = weekFromProgramDay(pd);
+        var block = blockForWeek(week);
+        var session = resolveSession(block, i + 1);
+        days.push({ programDay: pd, dow: i + 1, type: session.type, label: WEEK_TEMPLATE[i].num });
+      }
+      return days;
+    }
+    return { TOTAL_PROGRAM_DAYS: TOTAL_PROGRAM_DAYS, blockForWeek: blockForWeek, weekFromProgramDay: weekFromProgramDay, dowFromProgramDay: dowFromProgramDay, resolveSession: resolveSession, weekCircleData: weekCircleData };
+  })();
+
+  var Progression = (function(){
+    var LADDER = {
+      fuerza:          [ {reps:5,pct:85}, {reps:3,pct:90}, {reps:2,pct:93}, {reps:1,pct:96}, {reps:1,pct:99} ],
+      hipertrofia:     [ {reps:12,pct:60}, {reps:10,pct:65}, {reps:8,pct:70}, {reps:6,pct:75} ],
+      // Tercer nivel, solo para aislamiento de codo (curl, extensión de tríceps) en
+      // Bloques 2-4: mantiene el estímulo de tensión de "fuerza" sin acercarse a
+      // series de 1-3 reps cerca del 100% 1RM en una sola articulación pequeña —
+      // ver SAFETY_MESSAGES.aislamiento_codo y §metodologia.
+      tensionModerada: [ {reps:8,pct:72}, {reps:6,pct:76}, {reps:5,pct:80} ]
+    };
+    function round5(n){ return Math.round(n*2)/2; }
+    var FUERZA_WAVE = [90,93,96,99];
+    function fuerzaTopForWeek(week){
+      var block = Schedule.blockForWeek(week);
+      var offset = ((week - block.weekStart) % 4 + 4) % 4;
+      return FUERZA_WAVE[offset];
+    }
+    // Returns the ladder rungs actually prescribed, applying (a) a per-exercise permanent
+    // safety cap (via EXERCISES[id].capFuerza, e.g. a hinge exercise capped at 93%) and
+    // (b) the weekly undulating top for fuerza
+    // ladder (90/93/96/99, only reaching 99% once every 4 weeks). weekTopPct=100 means
+    // "no weekly wave truncation" — used for the static Plan Completo reference tables,
+    // where only the permanent per-exercise cap still applies.
+    function ladderRungsFor(exId, ladderType, weekTopPct){
+      if(ladderType !== "fuerza") return LADDER[ladderType];
+      var exCap = (EXERCISES[exId] && EXERCISES[exId].capFuerza) || 100;
+      var effectiveTop = Math.min(weekTopPct===undefined ? 100 : weekTopPct, exCap);
+      var rungs = LADDER.fuerza.filter(function(r){ return r.pct <= effectiveTop; });
+      return rungs.length ? rungs : [LADDER.fuerza[0]];
+    }
+    // Nivel que se muestra hoy para un ejercicio de bw{}. El marcado por el
+    // estudiante manda; sin marca, manda el bloque (blockId ya ES el nivel
+    // que el bloque propone, 1-4). Spec 2026-09-07 §4.
+    function nivelActual(exId, blockId){
+      var e = EXERCISES[exId];
+      if(!e || !e.bw) return null;
+      var guardado = parseInt(Storage.lsGet("nivel_"+exId), 10);
+      var n = (guardado>=1 && guardado<=4) ? guardado : blockId;
+      return e.bw[n] ? n : blockId;
+    }
+    // Agrupa rungs consecutivos que redondean al mismo kg real (mismo
+    // incrementoKg y mismo 1RM) — evita mostrar el mismo peso varias veces
+    // como si fueran objetivos distintos cuando el equipo no ajusta tan fino.
+    // Ver docs/superpowers/specs/2026-09-16-prescripcion-pesos-ajustables-design.md §3.4.
+    function rungGroupsFor(exId, rungs, rmOverride){
+      var groups = [];
+      rungs.forEach(function(r, i){
+        var kg = OneRM.kgLabel(exId, r.pct, rmOverride);
+        var last = groups[groups.length-1];
+        if(last && kg!=="—" && last.kg===kg){
+          last.rungs.push(r);
+          last.idxs.push(i);
+        } else {
+          groups.push({ kg:kg, rungs:[r], idxs:[i] });
+        }
+      });
+      return groups;
+    }
+    // True si el tope de fuerza de esta semana redondea al mismo kg real que
+    // el de la semana anterior del mismo bloque — el % nominal sube pero el
+    // peso ajustable no cambia. Ver §3.5 del spec de pesos ajustables.
+    function weeklyTopIsFlat(exId, week, rmOverride){
+      if(week<=1) return false;
+      var thisBlock = Schedule.blockForWeek(week);
+      var prevBlock = Schedule.blockForWeek(week-1);
+      if(thisBlock.id !== prevBlock.id) return false;
+      var exCap = (EXERCISES[exId] && EXERCISES[exId].capFuerza) || 100;
+      var topThis = Math.min(fuerzaTopForWeek(week), exCap);
+      var topPrev = Math.min(fuerzaTopForWeek(week-1), exCap);
+      // El aviso solo tiene sentido cuando el % nominal realmente sube: si el cap
+      // de seguridad deja ambas semanas en el mismo tope, o la onda retrocede al
+      // reiniciar dentro del bloque (semana 5/17, 99%→90%), no hay "% sube pero
+      // el kg no cambia" que explicar — sería un aviso con causa equivocada.
+      if(topThis <= topPrev) return false;
+      var kgThis = OneRM.kgLabel(exId, topThis, rmOverride);
+      var kgPrev = OneRM.kgLabel(exId, topPrev, rmOverride);
+      return kgThis!=="—" && kgThis===kgPrev;
+    }
+    return { LADDER: LADDER, fuerzaTopForWeek: fuerzaTopForWeek, ladderRungsFor: ladderRungsFor, nivelActual: nivelActual, round5: round5, rungGroupsFor: rungGroupsFor, weeklyTopIsFlat: weeklyTopIsFlat };
+  })();
+
+  var OneRM = (function(){
+    function getRM(id){
+      var el = document.getElementById("rm-"+id);
+      if(!el) return null;
+      var v = parseFloat(el.value);
+      return isNaN(v) ? null : v;
+    }
+    // Redondea siempre hacia abajo al incremento real de equipo del ejercicio
+    // (EXERCISES[id].incrementoKg) — nunca al 0.5kg que daba Progression.round5().
+    // rmOverride es opcional (uso de scripts/verify-weights.js); en el plan real
+    // siempre se omite y se usa el 1RM guardado por el estudiante.
+    function kgLabel(id, pct, rmOverride){
+      var rm = (rmOverride===undefined || rmOverride===null) ? getRM(id) : rmOverride;
+      if(rm===null || rm<=0) return "—";
+      var inc = (EXERCISES[id] && EXERCISES[id].incrementoKg) || 2.5;
+      var kg = Math.floor((rm*pct/100) / inc) * inc;
+      return kg.toFixed(1).replace(/\.0$/,"") + " kg";
+    }
+    return { getRM: getRM, kgLabel: kgLabel };
+  })();
+
+  var RenderPlanCompleto = (function(){
+    function renderLadderRefTable(mount, type){
+      var rows = Progression.LADDER[type].map(function(r,i){
+        return "<tr><td>"+(i+1)+"</td><td class=\"num\">"+r.reps+"</td><td class=\"num\">"+r.pct+"%</td></tr>";
+      }).join("");
+      document.getElementById(mount).innerHTML = rows;
+    }
+
+    function renderRMLog(){
+      var rows = "";
+      Object.keys(EXERCISES).forEach(function(id){
+        var e = EXERCISES[id];
+        if(COPY.rmLogTracks==="bw" ? !e.bw : !e.loaded) return;
+        rows += "<tr><td>"+e.name+"</td><td class=\"num\"></td><td class=\"num\"></td><td class=\"num\"></td><td class=\"num\"></td><td class=\"num\"></td></tr>";
+      });
+      document.getElementById("rmLogTable").innerHTML = rows;
+    }
+
+    function renderTimeline(){
+      var colorMap = {amber:"var(--amber)", violet:"var(--violet)", accent:"var(--accent)", teal:"var(--teal)"};
+      var chipMap = {amber:"chip-hipertrofia", violet:"chip-cardio", accent:"chip-fuerza", teal:"chip-movilidad"};
+      var html = BLOCKS.map(function(b){
+        return '<div class="tl-item">'+
+          '<div class="tl-weeks">'+b.weeks+'</div>'+
+          '<span class="chip '+chipMap[b.color]+'">'+b.sub+'</span>'+
+          '<h4 style="margin-top:8px;">Bloque '+b.id+' · '+b.nombre+'</h4>'+
+          '<p>'+b.resumen+'</p>'+
+          '<div class="tl-bar"><span style="width:100%; background:'+colorMap[b.color]+';"></span></div>'+
+        '</div>';
+      }).join("");
+      document.getElementById("timelineGrid").innerHTML = html;
+    }
+
+    function renderWeekGrid(){
+      var tagChip = {gym:"chip-fuerza", home:"chip-movilidad", rest:""};
+      var html = WEEK_TEMPLATE.map(function(d){
+        var chip = d.tag==="rest" ? '<span style="font-size:11.5px;color:var(--ink-3);">—</span>' : '<span class="chip '+tagChip[d.tag]+'">'+(d.tag==="gym"?COPY.chipGym:COPY.chipHome)+'</span>';
+        return '<div class="day-card"><div class="d-num">'+d.num+'</div><div class="d-name">'+d.name+'</div><div class="d-tag">'+chip+'</div></div>';
+      }).join("");
+      document.getElementById("weekGrid").innerHTML = html;
+    }
+
+    function ladderTableHTML(exId, ladderType){
+      if(ladderType===null){
+        return '<p style="font-size:12.5px;color:var(--ink-2);">'+COPY.ladderEmptyMsg+'</p>';
+      }
+      var rows = Progression.ladderRungsFor(exId, ladderType, 100).map(function(r){
+        return '<tr><td class="num">'+r.reps+' reps</td><td class="num">'+r.pct+'%</td><td class="num" data-rm-cell="'+exId+'" data-pct="'+r.pct+'" style="font-family:var(--font-mono);font-weight:650;color:var(--accent);">—</td></tr>';
+      }).join("");
+      return '<div class="tbl-scroll"><table style="min-width:0;"><thead><tr><th class="num">Reps</th><th class="num">% 1RM</th><th class="num">Tu peso</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+    }
+
+    function renderDay(day){
+      var items = day.ej.map(function(row){
+        var e = EXERCISES[row.id];
+      if(!e) return "";
+        var LADDER_CHIP_HTML = { fuerza:'<span class="chip chip-fuerza">Fuerza</span>', hipertrofia:'<span class="chip chip-hipertrofia">Hipertrofia</span>', tensionModerada:'<span class="chip chip-cardio">Tensión moderada</span>' };
+        var ladderChip = row.ladder===null ? "" : (LADDER_CHIP_HTML[row.ladder] || "");
+        return '<div class="card panel" style="margin-bottom:10px;">'+
+          '<div class="ex-name-cell">'+ Icons.svgIcon(e.icon,"ex-icon") +
+            '<div style="flex:1;"><span class="ex-name">'+e.name+'<span class="en">'+e.en+' · '+e.musculos+'</span></span></div>'+
+            ladderChip+
+          '</div>'+
+          '<div style="margin-top:10px;">'+ ladderTableHTML(row.id, row.ladder) +'</div>'+
+          '<div style="margin-top:10px;"><a class="btnlink" href="'+RenderBiblioteca.ytLink(e)+'" target="_blank" rel="noopener">Ver video ↗</a></div>'+
+        '</div>';
+      }).join("");
+      return '<div class="day-block"><div class="day-title"><h4>'+day.nombre+'</h4></div>'+items+'</div>';
+    }
+
+    function renderBlock(b){
+      var chipMap = {amber:"chip-hipertrofia", violet:"chip-cardio", accent:"chip-fuerza", teal:"chip-movilidad"};
+      var days = b.dias.map(renderDay).join("");
+      var html =
+        '<div class="section-head">'+
+          '<div class="section-kicker">'+b.weeks+'</div>'+
+          '<span class="chip '+chipMap[b.color]+'" style="margin-bottom:8px;">'+b.sub+'</span>'+
+          '<h2>Bloque '+b.id+' · '+b.nombre+'</h2>'+
+          '<p class="desc">'+b.resumen+'</p>'+
+        '</div>'+
+        '<div class="callout callout-accent" style="margin-bottom:20px;"><h4>Progresión de este bloque</h4><p>'+b.progresion+'</p></div>'+
+        days;
+      document.getElementById("blockMount-"+b.id).innerHTML = html;
+    }
+
+    function renderMobility(){
+      var rows = MOBILITY.map(function(r){
+        return '<tr><td>'+r[0]+'</td><td><a href="'+RenderBiblioteca.ytLink({name:r[1]})+'" target="_blank" rel="noopener">'+r[1]+' ↗</a></td><td class="num">'+r[2]+'</td><td>'+r[3]+'</td></tr>';
+      }).join("");
+      document.getElementById("mobilityTable").innerHTML = rows;
+    }
+
+    function renderCardio(){
+      var rows = CARDIO.map(function(r){
+        return '<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td class="num">'+r[3]+'</td></tr>';
+      }).join("");
+      document.getElementById("cardioTable").innerHTML = rows;
+    }
+
+    return {
+      renderLadderRefTable: renderLadderRefTable,
+      renderRMLog: renderRMLog,
+      renderTimeline: renderTimeline,
+      renderWeekGrid: renderWeekGrid,
+      renderBlock: renderBlock,
+      renderMobility: renderMobility,
+      renderCardio: renderCardio
+    };
+  })();
+
+  var RenderBiblioteca = (function(){
+    function ytLink(e){
+      return "https://www.youtube.com/results?search_query="+encodeURIComponent(e.name+" técnica correcta");
+    }
+
+    function renderLibrary(){
+      var html = Object.keys(EXERCISES).map(function(id){
+        var e = EXERCISES[id];
+        if(!e) return "";
+        var cues = e.cues.map(function(c){ return "<li>"+c+"</li>"; }).join("");
+        var safety = e.safety && SAFETY_MESSAGES[e.safety]
+          ? '<div class="safety-flag">'+(COPY.safetyFlagWarnGlyph?"⚠ ":"")+SAFETY_MESSAGES[e.safety].title+': '+SAFETY_MESSAGES[e.safety].text+'</div>'
+          : "";
+        return '<div class="card exlib-card">'+
+          '<div class="exlib-top">'+ Icons.svgIcon(e.icon,"exlib-icon") +
+            '<div><div class="ex-name">'+e.name+'<span class="en">'+e.en+'</span></div><div style="font-size:11.5px;color:var(--ink-3);margin-top:2px;">'+e.patron+' · '+e.musculos+'</div></div>'+
+          '</div>'+
+          '<ul class="exlib-cues">'+cues+'</ul>'+
+          safety+
+          '<div class="exlib-links">'+
+            '<a class="btnlink" href="'+ytLink(e)+'" target="_blank" rel="noopener">Ver video ↗</a>'+
+          '</div>'+
+        '</div>';
+      }).join("");
+      document.getElementById("exLibraryGrid").innerHTML = html;
+    }
+
+    return { ytLink: ytLink, renderLibrary: renderLibrary };
+  })();
+
+  var RenderProgreso = (function(){
+    function renderRMList(){
+      var kgRows = Object.keys(EXERCISES).map(function(id){
+        var e = EXERCISES[id];
+        if(!e.loaded) return "";
+        return '<div class="rm-row">'+
+          '<div><div class="rm-name">'+e.name+'</div><div class="rm-pat">'+e.patron+'</div></div>'+
+          '<div class="rm-r"><input class="rm-input" type="number" inputmode="decimal" min="0" step="0.5" id="rm-'+id+'" data-ex="'+id+'" placeholder="—"><span class="kgsuf">kg</span></div>'+
+        '</div>';
+      }).join("");
+      var nivelRows = Object.keys(EXERCISES).map(function(id){
+        var e = EXERCISES[id];
+        if(!e.bw) return "";
+        var opts = [1,2,3,4].map(function(n){ return '<option value="'+n+'">Nivel '+n+'</option>'; }).join("");
+        return '<div class="rm-row">'+
+          '<div><div class="rm-name">'+e.name+'</div><div class="rm-pat">'+e.patron+'</div></div>'+
+          '<div class="rm-r"><select class="rm-input" style="width:auto;" id="rm-nivel-'+id+'" data-nivel-ex="'+id+'"><option value="">—</option>'+opts+'</select></div>'+
+        '</div>';
+      }).join("");
+      var html = "";
+      if(kgRows) html += '<div class="rm-group"><h4 class="rm-group-title">Lo que se mide en kilos</h4>'+kgRows+'</div>';
+      if(nivelRows) html += '<div class="rm-group"><h4 class="rm-group-title">Lo que sube por nivel</h4>'+nivelRows+'</div>';
+      document.getElementById("rmList").innerHTML = html;
+    }
+
+    function recalcAll(){
+      var cells = document.querySelectorAll("[data-rm-cell]");
+      cells.forEach(function(c){
+        var id = c.getAttribute("data-rm-cell");
+        var pct = parseFloat(c.getAttribute("data-pct"));
+        c.textContent = OneRM.kgLabel(id, pct);
+      });
+      Object.keys(EXERCISES).forEach(function(id){
+        var e = EXERCISES[id];
+        if(!e.bw) return;
+        var sel = document.getElementById("rm-nivel-"+id);
+        if(!sel) return;
+        var stored = Storage.lsGet("nivel_"+id);
+        sel.value = (stored===null ? "" : stored);
+      });
+      RenderHoy.renderToday();
+    }
+
+    function wireRMInputs(){
+      Object.keys(EXERCISES).forEach(function(id){
+        var e = EXERCISES[id];
+        if(e.loaded){
+          var el = document.getElementById("rm-"+id);
+          if(el){
+            var stored = Storage.lsGet("oneRM_"+id);
+            if(stored !== null) el.value = stored;
+            el.addEventListener("input", function(){
+              if(el.value === "") { Storage.lsRemove("oneRM_"+id); }
+              else { Storage.lsSet("oneRM_"+id, el.value); }
+              recalcAll();
+            });
+          }
+        }
+        if(e.bw){
+          var sel = document.getElementById("rm-nivel-"+id);
+          if(sel){
+            var storedNivel = Storage.lsGet("nivel_"+id);
+            if(storedNivel !== null) sel.value = storedNivel;
+            sel.addEventListener("change", function(){
+              if(sel.value === "") { Storage.lsRemove("nivel_"+id); }
+              else { Storage.lsSet("nivel_"+id, sel.value); }
+              recalcAll();
+            });
+          }
+        }
+      });
+    }
+
+    function wireEpleyCalculator(){
+      var w = document.getElementById("epleyWeight");
+      var r = document.getElementById("epleyReps");
+      var out = document.getElementById("epleyResult");
+      if(!w || !r || !out) return;
+      function recalc(){
+        var weight = parseFloat(w.value);
+        var reps = parseFloat(r.value);
+        if(isNaN(weight) || isNaN(reps) || weight<=0 || reps<=0){ out.textContent = "—"; return; }
+        var oneRM = weight * (1 + reps/30);
+        out.textContent = oneRM.toFixed(1).replace(/\.0$/,"") + " kg";
+      }
+      w.addEventListener("input", recalc);
+      r.addEventListener("input", recalc);
+    }
+
+    return { renderRMList: renderRMList, recalcAll: recalcAll, wireRMInputs: wireRMInputs, wireEpleyCalculator: wireEpleyCalculator };
+  })();
+
+  var RenderHoy = (function(){
+    var hoyState = { programDay:1, previewProgramDay:null };
+
+    function loadHoyState(){
+      var pd = parseInt(Storage.lsGet("plan_day_seq"),10);
+      hoyState.programDay = (pd>=1 && pd<=Schedule.TOTAL_PROGRAM_DAYS) ? pd : 1;
+    }
+    function saveProgramDay(){ Storage.lsSet("plan_day_seq", String(hoyState.programDay)); }
+
+    function renderWeekBanners(week){
+      var html = "";
+      var isDeload = DELOAD_WEEKS.indexOf(week)!==-1;
+      var isRetest = RETEST_WEEKS.indexOf(week)!==-1;
+      if(isDeload){
+        html += '<div class="banner banner-deload"><b>Semana de deload</b>Reduce el volumen a la mitad esta semana (menos series, misma técnica). El cuerpo consolida lo acumulado antes de subir de nivel.</div>';
+      }
+      if(isRetest){
+        var block = Schedule.blockForWeek(week);
+        var atras = Object.keys(EXERCISES).filter(function(id){
+          var e = EXERCISES[id];
+          return e.bw && Progression.nivelActual(id, block.id) < block.id;
+        }).map(function(id){ return EXERCISES[id].name; });
+        var retestBody = atras.length ? COPY.retestMsgWithLevels(block.id, atras) : COPY.retestMsgNoLevels();
+        html += '<div class="banner banner-retest"><b>'+COPY.retestTitle+'</b>'+retestBody+'</div>';
+      }
+      document.getElementById("weekBanners").innerHTML = html;
+    }
+
+    // Fila de una o más series fusionadas (mismo kg real tras redondear al
+    // incremento del ejercicio). Con un solo rung se ve igual que antes; con
+    // varios, muestra el rango de series/reps/% y un solo checkbox de "hecho"
+    // para el bloque completo. Ver §3.4 del spec de pesos ajustables.
+    function rungGroupRowHTML(exId, group, programDay){
+      var idxs = group.idxs;
+      var first = idxs[0], last = idxs[idxs.length-1];
+      var storageKey = "chk_pd"+programDay+"_"+exId+"_"+first+(last!==first ? ("-"+last) : "");
+      var checked = Storage.lsGet(storageKey) === "1";
+      var serieLabel = (idxs.length===1) ? ("Serie "+(first+1)) : ("Series "+(first+1)+"-"+(last+1));
+      // Reps por serie, no un rango: un rango ("6-12 reps") se lee como "haz entre
+      // 6 y 12 repeticiones", perdiendo la rampa descendente real de la
+      // hipertrofia/tensión moderada (ej. 12/10/8/6). El peso fusiona porque es
+      // el mismo kg real; las reps de cada serie siguen siendo la prescripción.
+      var repsLabel = group.rungs.map(function(r){ return r.reps; }).join("/") + " reps";
+      var pctLo = group.rungs[0].pct, pctHi = group.rungs[group.rungs.length-1].pct;
+      var pctLabel = (pctLo===pctHi) ? (pctLo+"% 1RM") : (pctLo+"-"+pctHi+"% 1RM");
+      return '<label class="rung-row'+(checked?" is-done":"")+'" data-chk-key="'+storageKey+'">'+
+        '<input type="checkbox" class="rung-check"'+(checked?" checked":"")+'>'+
+        '<span class="rung-reps">'+serieLabel+' · '+repsLabel+' <span class="rung-pct">('+pctLabel+')</span></span>'+
+        '<span class="rung-kg" data-rm-cell="'+exId+'" data-pct="'+pctLo+'">'+group.kg+'</span>'+
+      '</label>';
+    }
+
+    function workoutCardHTML(row, blockId, programDay, weekTopPct){
+      var e = EXERCISES[row.id];
+      if(!e) return "";
+      var body, nivelControls = "";
+      if(row.ladder===null){
+        var nivel = Progression.nivelActual(row.id, blockId);
+        var dose = (e.bw && e.bw[nivel]) ? e.bw[nivel] : {sets:3, variante:"", dosis:"progresión gradual"};
+        var bwRows = [];
+        for(var si=0; si<dose.sets; si++){
+          var bwKey = "chk_pd"+programDay+"_"+row.id+"_"+si;
+          var bwChecked = Storage.lsGet(bwKey) === "1";
+          bwRows.push('<label class="rung-row'+(bwChecked?" is-done":"")+'" data-chk-key="'+bwKey+'">'+
+            '<input type="checkbox" class="rung-check"'+(bwChecked?" checked":"")+'>'+
+            '<span class="rung-reps">Serie '+(si+1)+' · '+dose.dosis+'</span>'+
+          '</label>');
+        }
+        body = bwRows.join("");
+        if(e.bw){
+          var opts = [1,2,3,4].map(function(n){
+            return '<option value="'+n+'"'+(n===nivel?" selected":"")+'>Nivel '+n+'</option>';
+          }).join("");
+          nivelControls = '<select class="nivel-select" data-nivel-ex="'+row.id+'">'+opts+'</select>';
+          var nvRows = [1,2,3,4].map(function(n){
+            var lv = e.bw[n];
+            return '<div class="nv-row'+(n===nivel?" is-current":"")+'"><span class="nv-dot">'+(n===nivel?"●":n)+'</span><span>'+lv.variante+' · '+lv.dosis+'</span></div>';
+          }).join("");
+          body += '<details class="niveles"><summary></summary><div class="niveles-list">'+nvRows+'</div></details>';
+        }
+      } else {
+        var rm = OneRM.getRM(row.id);
+        var rungs = (row.ladder==="fuerza") ? Progression.ladderRungsFor(row.id, row.ladder, weekTopPct) : Progression.LADDER[row.ladder];
+        var groups = Progression.rungGroupsFor(row.id, rungs, rm);
+        var rows = groups.map(function(g){
+          return rungGroupRowHTML(row.id, g, programDay);
+        }).join("");
+        body = rows;
+        if(rm===null){
+          body += '<div class="rm-nudge" style="margin-top:8px;"><span>Falta tu 1RM para calcular el peso.</span><button type="button" data-goto-rm data-focus-ex="'+row.id+'">Ingresar</button></div>';
+        }
+      }
+      var safety = e.safety && SAFETY_MESSAGES[e.safety]
+        ? '<div class="safety-flag">'+(COPY.safetyFlagWarnGlyph?"⚠ ":"")+SAFETY_MESSAGES[e.safety].title+': '+SAFETY_MESSAGES[e.safety].text+'</div>'
+        : "";
+      var cues = e.cues.map(function(c){ return "<li>"+c+"</li>"; }).join("");
+      var videoBtn = '<a class="btnlink" href="'+RenderBiblioteca.ytLink(e)+'" target="_blank" rel="noopener">Ver video ↗</a>';
+      return '<div class="card panel wk-card">'+
+        '<div class="wk-head">'+ Icons.svgIcon(e.icon,"ex-icon") +
+          '<div><div class="wk-name">'+e.name+'</div><div class="wk-sub">'+e.en+' · '+e.musculos+'</div></div>'+
+        '</div>'+
+        '<div class="wk-controls">'+nivelControls+videoBtn+'</div>'+
+        '<div style="margin-top:10px;">'+body+'</div>'+
+        safety+
+        '<details class="tech"><summary></summary><ul class="exlib-cues">'+cues+'</ul></details>'+
+      '</div>';
+    }
+
+    var DOW_LETTERS = ["L","M","X","J","V","S","D"];
+    function dowShortLabel(label, dow){
+      var m = /^Día\s*(\d+)/.exec(label);
+      return m ? m[1] : DOW_LETTERS[dow-1];
+    }
+    function glyphForType(type){ return type==="gym" ? "●" : (type==="casa" ? "△" : "Z"); }
+    function typeLabel(type){ return type==="gym" ? COPY.chipGym.toLowerCase() : (type==="casa" ? COPY.chipHome.toLowerCase() : "descanso"); }
+
+    function renderWeekStrip(){
+      var days = Schedule.weekCircleData(hoyState.programDay);
+      var html = days.map(function(d){
+        var isDone = d.programDay < hoyState.programDay;
+        var isToday = d.programDay === hoyState.programDay;
+        var isPreview = hoyState.previewProgramDay !== null && d.programDay === hoyState.previewProgramDay;
+        var cls = "day-circle" + (isDone?" is-done":"") + (isToday?" is-today":"") + (isPreview?" is-preview":"");
+        var stateLabel = isDone ? "hecho" : (isToday ? "hoy" : "pendiente");
+        return '<div class="week-strip-day">'+
+          '<button type="button" class="'+cls+'" data-preview-pd="'+d.programDay+'" aria-label="'+d.label+', '+typeLabel(d.type)+', '+stateLabel+'">'+
+            glyphForType(d.type)+
+          '</button>'+
+          '<span class="week-strip-dow">'+dowShortLabel(d.label, d.dow)+'</span>'+
+        '</div>';
+      }).join("");
+      document.getElementById("weekStrip").innerHTML = html;
+    }
+
+    function renderPreviewBanner(){
+      var el = document.getElementById("previewBanner");
+      if(hoyState.previewProgramDay === null || hoyState.previewProgramDay === hoyState.programDay){
+        el.innerHTML = "";
+        return;
+      }
+      var days = Schedule.weekCircleData(hoyState.programDay);
+      var previewed = days.filter(function(d){ return d.programDay === hoyState.previewProgramDay; })[0];
+      el.innerHTML = '<p class="preview-banner">Viendo: '+previewed.label.toLowerCase()+' · <button type="button" class="btnlink" id="previewBackBtn">Volver a hoy</button></p>';
+      document.getElementById("previewBackBtn").addEventListener("click", function(){
+        hoyState.previewProgramDay = null;
+        renderToday();
+      });
+    }
+
+    function renderProgressRing(){
+      var week = Schedule.weekFromProgramDay(hoyState.programDay);
+      var pct = Math.round((hoyState.programDay-1) / Schedule.TOTAL_PROGRAM_DAYS * 100);
+      var circumference = 2*Math.PI*16;
+      var offset = circumference * (1 - pct/100);
+      var fill = document.getElementById("progressRingFill");
+      fill.style.strokeDasharray = circumference.toFixed(2);
+      fill.style.strokeDashoffset = offset.toFixed(2);
+      document.getElementById("progressRingLabel").textContent = String(week);
+      document.getElementById("progressRing").setAttribute("aria-label", "Semana "+week+" de 24 · "+pct+"% del programa completado");
+    }
+
+    function wireWeekStrip(){
+      document.getElementById("weekStrip").addEventListener("click", function(e){
+        var btn = e.target.closest("[data-preview-pd]");
+        if(!btn) return;
+        var pd = Number(btn.getAttribute("data-preview-pd"));
+        hoyState.previewProgramDay = (pd === hoyState.programDay) ? null : pd;
+        renderToday();
+      });
+    }
+
+    function renderToday(){
+      var pd = hoyState.previewProgramDay || hoyState.programDay;
+      var week = Schedule.weekFromProgramDay(pd);
+      var dow = Schedule.dowFromProgramDay(pd);
+      var block = Schedule.blockForWeek(week);
+      var session = Schedule.resolveSession(block, dow);
+
+      renderWeekStrip();
+      renderPreviewBanner();
+      renderProgressRing();
+      renderWeekBanners(week);
+      document.getElementById("blockTag").innerHTML = 'Bloque '+block.id+' · <b>'+block.nombre+'</b> ('+block.sub+') — '+block.weeks;
+
+      var mount = document.getElementById("todayMount");
+
+      if(session.type==="rest"){
+        document.getElementById("seqTitle").textContent = "Hoy: descanso";
+        mount.innerHTML = '<div class="card panel rest-card">'+
+          '<h3>Día de descanso</h3>'+
+          '<p>No entrenas hoy. Duerme bien, hidrátate y deja que el cuerpo asimile lo trabajado. Mañana retoma donde corresponda.</p>'+
+        '</div>';
+      } else if(session.type==="casa"){
+        document.getElementById("seqTitle").textContent = "Hoy: movilidad y cardio (casa)";
+        var mobRows = MOBILITY.filter(function(r){ return r[0]==="Todos" || r[0].indexOf(String(block.id))!==-1; })
+          .map(function(r){ return '<tr><td><a href="'+RenderBiblioteca.ytLink({name:r[1]})+'" target="_blank" rel="noopener">'+r[1]+' ↗</a></td><td class="num">'+r[2]+'</td><td>'+r[3]+'</td></tr>'; }).join("");
+        var cardioRow = CARDIO[block.id-1];
+        mount.innerHTML =
+          '<div class="wk-card"><div class="section-kicker" style="margin-top:14px;">Movilidad y flexibilidad</div>'+
+          '<div class="tbl-scroll"><table><thead><tr><th>Ejercicio</th><th class="num">Dosis</th><th>Foco</th></tr></thead><tbody>'+mobRows+'</tbody></table></div>'+
+          '<div class="callout '+COPY.homeWarningClass+'" style="margin-top:14px;"><h4>'+(COPY.homeWarningGlyph?"⚠ ":"")+HOME_DAY_WARNING.title+'</h4><p>'+HOME_DAY_WARNING.text+'</p></div>'+
+          '<div class="section-kicker" style="margin-top:20px;">Cardio de hoy'+(COPY.cardioOptional?" (opcional)":"")+'</div>'+
+          '<div class="card panel" style="margin-top:8px;"><p style="font-size:13.5px;"><strong>'+cardioRow[2]+'</strong><br><span style="color:var(--ink-2); font-size:12.5px;">'+cardioRow[1]+' · '+cardioRow[3]+'</span></p></div>'+
+          '</div>';
+      } else {
+        var day = session.day;
+        document.getElementById("seqTitle").textContent = "Hoy: "+day.short;
+        var weekTop = Progression.fuerzaTopForWeek(week);
+        var cards = day.ej.map(function(row){ return workoutCardHTML(row, block.id, pd, weekTop); }).join("");
+        // Tope mostrado = el más alto que hoy realmente se prescribe: la onda de la
+        // semana, recortada por el cap más alto entre los ejercicios de fuerza del
+        // día (si TODOS están capados, como en un perfil con dolor activo, el banner
+        // baja al cap). Los ejercicios con un cap propio por debajo de ese tope se
+        // listan aparte — antes el banner tomaba el mínimo de los caps y decía
+        // "93%" en un día donde otro ejercicio sí llegaba a 99%.
+        // anyFlat: si el tope de esta semana redondea al mismo kg real que el de
+        // la semana anterior del mismo bloque para algún ejercicio, el % nominal
+        // sube pero el equipo no tiene ajuste más fino — se avisa en vez de
+        // dejarlo mudo.
+        var displayTop = weekTop, maxCap = 0, capped = [], anyFlat = false;
+        if(day.ladderTag==="fuerza"){
+          day.ej.forEach(function(row){
+            if(row.ladder==="fuerza"){
+              var exCap = (EXERCISES[row.id] && EXERCISES[row.id].capFuerza) || 100;
+              maxCap = Math.max(maxCap, exCap);
+            }
+          });
+          if(maxCap) displayTop = Math.min(displayTop, maxCap);
+          day.ej.forEach(function(row){
+            if(row.ladder==="fuerza"){
+              var exCap2 = (EXERCISES[row.id] && EXERCISES[row.id].capFuerza) || 100;
+              if(exCap2 < displayTop) capped.push(EXERCISES[row.id].name.toLowerCase()+" se detiene en "+exCap2+"%");
+              if(Progression.weeklyTopIsFlat(row.id, week, OneRM.getRM(row.id))) anyFlat = true;
+            }
+          });
+        }
+        var flatNote = anyFlat ? ' <span style="color:var(--accent); font-weight:400;">· el peso no cambia esta semana porque tu equipo no ajusta más fino acá — igual progresas: se pide una repetición menos con el mismo peso</span>' : "";
+        var waveNote = (day.ladderTag==="fuerza") ? ' <span style="color:var(--ink-3); font-weight:400;">· tope de hoy '+displayTop+'% 1RM'+(capped.length?" · "+capped.join(", "):"")+'</span>'+flatNote : "";
+        mount.innerHTML = '<div class="wk-card"><div class="section-kicker" style="margin-top:14px;">'+day.short+waveNote+'</div>'+cards+'</div>';
+      }
+
+      document.getElementById("dayPrev").disabled = (hoyState.programDay<=1);
+      document.getElementById("dayNext").disabled = (hoyState.programDay>=Schedule.TOTAL_PROGRAM_DAYS);
+
+      recalcRungLabels();
+      wireRungChecks();
+      wireNivelSelects();
+      wireGotoRM();
+    }
+
+    function recalcRungLabels(){
+      var cells = document.querySelectorAll("#todayMount [data-rm-cell]");
+      cells.forEach(function(c){
+        var id = c.getAttribute("data-rm-cell");
+        var pct = parseFloat(c.getAttribute("data-pct"));
+        c.textContent = OneRM.kgLabel(id, pct);
+      });
+    }
+
+    function wireRungChecks(){
+      Array.prototype.forEach.call(document.querySelectorAll("#todayMount [data-chk-key]"), function(row){
+        var checkbox = row.querySelector(".rung-check");
+        checkbox.addEventListener("change", function(){
+          var key = row.getAttribute("data-chk-key");
+          if(checkbox.checked){ Storage.lsSet(key,"1"); row.classList.add("is-done"); }
+          else { Storage.lsRemove(key); row.classList.remove("is-done"); }
+        });
+      });
+    }
+
+    function wireNivelSelects(){
+      Array.prototype.forEach.call(document.querySelectorAll("#todayMount [data-nivel-ex]"), function(sel){
+        sel.addEventListener("change", function(){
+          var exId = sel.getAttribute("data-nivel-ex");
+          Storage.lsSet("nivel_"+exId, sel.value);
+          RenderProgreso.recalcAll();
+        });
+      });
+    }
+
+    function wireGotoRM(){
+      Array.prototype.forEach.call(document.querySelectorAll("[data-goto-rm]"), function(btn){
+        btn.addEventListener("click", function(){
+          var exId = btn.getAttribute("data-focus-ex");
+          Tabs.switchTab("rm");
+          setTimeout(function(){
+            var input = document.getElementById("rm-"+exId);
+            if(input){ input.focus(); }
+          }, 50);
+        });
+      });
+    }
+
+    function goToProgramDay(pd){
+      hoyState.programDay = Math.max(1, Math.min(Schedule.TOTAL_PROGRAM_DAYS, pd));
+      hoyState.previewProgramDay = null;
+      saveProgramDay();
+      renderToday();
+    }
+    function wireSeqNav(){
+      document.getElementById("dayPrev").addEventListener("click", function(){ goToProgramDay(hoyState.programDay-1); });
+      document.getElementById("dayNext").addEventListener("click", function(){ goToProgramDay(hoyState.programDay+1); });
+      document.getElementById("jumpGo").addEventListener("click", function(){
+        var w = parseInt(document.getElementById("jumpWeek").value,10);
+        if(w>=1 && w<=24){ goToProgramDay((w-1)*7+1); }
+      });
+    }
+
+    return {
+      renderToday: renderToday,
+      goToProgramDay: goToProgramDay,
+      loadHoyState: loadHoyState,
+      saveProgramDay: saveProgramDay,
+      wireSeqNav: wireSeqNav,
+      wireWeekStrip: wireWeekStrip,
+      wireRungChecks: wireRungChecks,
+      wireNivelSelects: wireNivelSelects,
+      wireGotoRM: wireGotoRM
+    };
+  })();
+
+  var Tabs = (function(){
+    function switchTab(name){
+      Array.prototype.forEach.call(document.querySelectorAll(".tab-panel"), function(p){
+        p.classList.toggle("is-active", p.getAttribute("data-tab")===name);
+      });
+      Array.prototype.forEach.call(document.querySelectorAll("[data-tab-btn]"), function(btn){
+        btn.classList.toggle("is-active", btn.getAttribute("data-tab-btn")===name);
+      });
+      Storage.lsSet("plan_tab", name);
+      window.scrollTo(0,0);
+    }
+    function wireTabs(){
+      Array.prototype.forEach.call(document.querySelectorAll("[data-tab-btn]"), function(btn){
+        btn.addEventListener("click", function(){ switchTab(btn.getAttribute("data-tab-btn")); });
+      });
+    }
+    return { switchTab: switchTab, wireTabs: wireTabs };
+  })();
+
+  var Theme = (function(){
+    function initTheme(){
+      var btn = document.getElementById("themeToggle");
+      var stored = Storage.lsGet("plan_theme");
+      if(stored){ document.documentElement.setAttribute("data-theme", stored); }
+      btn.addEventListener("click", function(){
+        var current = document.documentElement.getAttribute("data-theme");
+        var next = current==="dark" ? "light" : "dark";
+        document.documentElement.setAttribute("data-theme", next);
+        Storage.lsSet("plan_theme", next);
+      });
+    }
+    return { initTheme: initTheme };
+  })();
+
+  /* ================= INIT ================= */
+  function init(){
+    // Este plan no muestra tablas de referencia de ladder por %1RM: ningún
+    // ejercicio usa porcentaje (ver bloque DATOS). renderLadderRefTable() queda
+    // definida en el motor pero sin puntos de montaje que llamar.
+    RenderProgreso.renderRMList();
+    RenderPlanCompleto.renderRMLog();
+    RenderPlanCompleto.renderTimeline();
+    RenderPlanCompleto.renderWeekGrid();
+    BLOCKS.forEach(RenderPlanCompleto.renderBlock);
+    RenderPlanCompleto.renderMobility();
+    RenderBiblioteca.renderLibrary();
+    RenderProgreso.wireRMInputs();
+    RenderProgreso.wireEpleyCalculator();
+
+    RenderHoy.loadHoyState();
+    RenderHoy.wireSeqNav();
+    RenderHoy.wireWeekStrip();
+    RenderHoy.renderToday();
+
+    Tabs.wireTabs();
+    var savedTab = Storage.lsGet("plan_tab");
+    if(savedTab){ Tabs.switchTab(savedTab); }
+
+    Theme.initTheme();
+  }
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>
