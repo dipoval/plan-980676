@@ -1447,7 +1447,7 @@
           .map(function(r){ return '<tr><td><a href="'+RenderBiblioteca.ytLink({name:r[1]})+'" target="_blank" rel="noopener">'+r[1]+' ↗</a></td><td class="num">'+r[2]+'</td><td>'+r[3]+'</td></tr>'; }).join("");
         var cardioRow = CARDIO[block.id-1];
         mount.innerHTML =
-          '<div class="wk-card"><div class="section-kicker" style="margin-top:14px;">Movilidad y flexibilidad</div>'+
+          '<div class="wk-card"><div class="section-kicker" style="margin-top:14px;">'+(COPY.homeMobilityKicker||"Movilidad y flexibilidad")+'</div>'+
           '<div class="tbl-scroll"><table><thead><tr><th>Ejercicio</th><th class="num">Dosis</th><th>Foco</th></tr></thead><tbody>'+mobRows+'</tbody></table></div>'+
           '<div class="callout '+COPY.homeWarningClass+'" style="margin-top:14px;"><h4>'+(COPY.homeWarningGlyph?"⚠ ":"")+HOME_DAY_WARNING.title+'</h4><p>'+HOME_DAY_WARNING.text+'</p></div>'+
           '<div class="section-kicker" style="margin-top:20px;">Cardio de hoy'+(COPY.cardioOptional?" (opcional)":"")+'</div>'+
