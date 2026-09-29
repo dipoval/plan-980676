@@ -889,6 +889,13 @@
     var LADDER = {
       fuerza:          [ {reps:5,pct:85}, {reps:3,pct:90}, {reps:2,pct:93}, {reps:1,pct:96}, {reps:1,pct:99} ],
       hipertrofia:     [ {reps:12,pct:60}, {reps:10,pct:65}, {reps:8,pct:70}, {reps:6,pct:75} ],
+      // Zona que el estudiante NO marco ni con F ni con H, pero cuyo ejercicio
+      // entra igual al catalogo por equilibrio (§4.3): se entrena para
+      // tonificar — muchas repeticiones con poco peso y descanso corto — no
+      // para ganar volumen ni para acercarse a un maximo. Regla del relator
+      // del 2026-09-29, reemplaza el default "hipertrofia" de §4.2.
+      // Descanso entre series: 45-60 seg.
+      tonificacion:    [ {reps:20,pct:50}, {reps:15,pct:60}, {reps:15,pct:60} ],
       // Tercer nivel, solo para aislamiento de codo (curl, extensión de tríceps) en
       // Bloques 2-4: mantiene el estímulo de tensión de "fuerza" sin acercarse a
       // series de 1-3 reps cerca del 100% 1RM en una sola articulación pequeña —
@@ -1050,7 +1057,7 @@
       var items = day.ej.map(function(row){
         var e = EXERCISES[row.id];
       if(!e) return "";
-        var LADDER_CHIP_HTML = { fuerza:'<span class="chip chip-fuerza">Fuerza</span>', hipertrofia:'<span class="chip chip-hipertrofia">Hipertrofia</span>', tensionModerada:'<span class="chip chip-cardio">Tensión moderada</span>', mixto:'<span class="chip chip-fuerza">Fuerza + hipertrofia</span>', mixtoModerado:'<span class="chip chip-cardio">Tensión + volumen</span>' };
+        var LADDER_CHIP_HTML = { fuerza:'<span class="chip chip-fuerza">Fuerza</span>', hipertrofia:'<span class="chip chip-hipertrofia">Hipertrofia</span>', tensionModerada:'<span class="chip chip-cardio">Tensión moderada</span>', mixto:'<span class="chip chip-fuerza">Fuerza + hipertrofia</span>', mixtoModerado:'<span class="chip chip-cardio">Tensión + volumen</span>', tonificacion:'<span class="chip chip-movilidad">Tonificación</span>' };
         var ladderChip = row.ladder===null ? "" : (LADDER_CHIP_HTML[row.ladder] || "");
         return '<div class="card panel" style="margin-bottom:10px;">'+
           '<div class="ex-name-cell">'+ Icons.svgIcon(e.icon,"ex-icon") +
