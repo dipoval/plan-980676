@@ -611,6 +611,7 @@
     retestTitle: "Semana de medición",
     retestMsgWithLevels: function(blockId, atras){ return 'Haz tus cuatro mediciones después de la entrada en calor y anótalas en «Plan completo» → Registro. El plan ya propone nivel '+blockId+' en '+atras.join(", ")+': si llegas a esa posición sin dolor y respirando parejo, sube de nivel en «Mi progreso».'; },
     retestMsgNoLevels: function(){ return 'Haz tus cuatro mediciones después de la entrada en calor y anótalas en «Plan completo» → Registro, y revisa en «Mi progreso» en qué nivel estás en cada ejercicio.'; },
+    retestMsgFinal: function(){ return 'Última medición del plan: haz tus cuatro mediciones después de la entrada en calor, anótalas en «Plan completo» → Registro y compáralas con las de la semana 1. Esta semana no se cambia de nivel: anota en «Mi progreso» en cuál terminas cada ejercicio.'; },
     cardioOptional: false,
     safetyFlagWarnGlyph: false,
     homeWarningClass: "callout-accent",
@@ -824,7 +825,12 @@
     // Migración de una sola vez: este plan usaba el nombre del estudiante como
     // prefijo de guardado, y ese texto quedaba a la vista en el código publicado.
     // Si queda progreso bajo el prefijo antiguo, se traslada al actual.
+    // Solo corre en los planes que la piden (COPY.migrarPrefijoAntiguo): los
+    // planes comparten origen, y sin esa marca cualquier otro plan copiaría a
+    // su espacio el progreso de un prefijo antiguo ajeno. Ver spec de
+    // auditoría 2026-10-07, P4.
     (function migrarPrefijoGuardado(){
+      if(!COPY.migrarPrefijoAntiguo) return;
       try {
         var ls = window.localStorage, claves = [], previos = [], i, m;
         for(i=0; i<ls.length; i++) claves.push(ls.key(i));
@@ -1266,7 +1272,13 @@
           var e = EXERCISES[id];
           return e.bw && Progression.nivelActual(id, block.id) < block.id;
         }).map(function(id){ return EXERCISES[id].name; });
-        var retestBody = atras.length ? COPY.retestMsgWithLevels(block.id, atras) : COPY.retestMsgNoLevels();
+        // La última revisión es de cierre: un plan que define
+        // COPY.retestMsgFinal no le dice «ya puedes subir de nivel» a quien
+        // termina el programa esa misma semana. Sin él, mensaje de siempre.
+        // Ver spec de auditoría 2026-10-07, P2 #7.
+        var esCierre = week === RETEST_WEEKS[RETEST_WEEKS.length-1];
+        var retestBody = (esCierre && COPY.retestMsgFinal) ? COPY.retestMsgFinal(block.id, atras)
+          : (atras.length ? COPY.retestMsgWithLevels(block.id, atras) : COPY.retestMsgNoLevels());
         html += '<div class="banner banner-retest"><b>'+COPY.retestTitle+'</b>'+retestBody+'</div>';
       }
       document.getElementById("weekBanners").innerHTML = html;
@@ -1318,6 +1330,13 @@
           '</label>');
         }
         body = bwRows.join("");
+        // La variante que toca hoy va a la vista, sobre las series: sin esto la
+        // tarjeta muestra el nombre fijo del ejercicio y la variante del nivel
+        // (ej. «goblet con la pesa rusa») solo aparece al desplegar «Los 4
+        // niveles». Ver spec de auditoría 2026-10-07, P2 #6.
+        if(e.bw && dose.variante){
+          body = '<div class="nv-hoy" style="font-size:13px; color:var(--accent); font-weight:650; padding-bottom:6px;">Nivel '+nivel+' · '+dose.variante+'</div>' + body;
+        }
         if(e.bw){
           var opts = [1,2,3,4].map(function(n){
             return '<option value="'+n+'"'+(n===nivel?" selected":"")+'>Nivel '+n+'</option>';
