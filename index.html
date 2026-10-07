@@ -410,7 +410,7 @@
           <div class="card panel">
             <span class="chip chip-movilidad">Las cuatro herramientas</span>
             <h3 style="margin-top:10px; font-size:16px;">Qué cambia de un nivel a otro</h3>
-            <p style="margin-top:8px; color:var(--ink-2); font-size:13.5px;">Todas aparecen en la dosis que te muestra la pestaña «Hoy». Solo necesitas una banda, una pared y el suelo.</p>
+            <p style="margin-top:8px; color:var(--ink-2); font-size:13.5px;">Todas aparecen en la dosis que te muestra la pestaña «Hoy». Solo necesitas una banda, una pared, el suelo y muebles firmes de la casa.</p>
             <div class="tbl-scroll" style="margin-top:14px;">
               <table>
                 <thead><tr><th>Herramienta</th><th>Cómo se hace</th></tr></thead>
@@ -433,7 +433,7 @@
               <table>
                 <thead><tr><th>Bloque</th><th>Herramienta principal</th></tr></thead>
                 <tbody>
-                  <tr><td>1</td><td>Estático: aprender cada posición y dónde se siente</td></tr>
+                  <tr><td>1</td><td>Estático y rango cómodo: aprender cada posición y dónde se siente</td></tr>
                   <tr><td>2</td><td>Contraer y relajar: el rango se abre más rápido</td></tr>
                   <tr><td>3</td><td>Rango activo: sostener el rango con tu músculo</td></tr>
                   <tr><td>4</td><td>Integración: flujos y consolidación</td></tr>
@@ -512,7 +512,7 @@
             <li><strong>Nunca rebotes.</strong> Se llega y se sostiene, o se entra y sale lento. El rebote activa el reflejo que cierra el rango.</li>
             <li><strong>Entra en calor primero.</strong> Los 5–8 minutos de la tabla de arriba no son opcionales: son los que hacen que el resto de la sesión rinda.</li>
             <li>Las semanas de deload (8 y 20) son parte del plan: la mitad de las series, misma calidad. El rango se consolida ahí.</li>
-            <li>Haz las cuatro pruebas de medición en las semanas 1, 8, 12, 20 y 24, siempre después de la misma entrada en calor, y anótalas en el Registro.</li>
+            <li>Haz las cuatro pruebas de medición en las semanas 1, 8, 12, 20 y 24, siempre después de la misma entrada en calor, y anótalas en una nota del teléfono o en la tabla impresa del Registro.</li>
             <li>Si aparece dolor que no cede o mareo que no pasa, detén la sesión y coméntalo con el relator.</li>
           </ul>
         </div>
@@ -609,9 +609,9 @@
     ladderEmptyMsg: "Progresa por nivel: posición, tiempo y herramienta. La dosis exacta de tu nivel actual aparece en la pestaña Hoy.",
     rmLogTracks: "bw",
     retestTitle: "Semana de medición",
-    retestMsgWithLevels: function(blockId, atras){ return 'Haz tus cuatro mediciones después de la entrada en calor y anótalas en «Plan completo» → Registro. El plan ya propone nivel '+blockId+' en '+atras.join(", ")+': si llegas a esa posición sin dolor y respirando parejo, sube de nivel en «Mi progreso».'; },
-    retestMsgNoLevels: function(){ return 'Haz tus cuatro mediciones después de la entrada en calor y anótalas en «Plan completo» → Registro, y revisa en «Mi progreso» en qué nivel estás en cada ejercicio.'; },
-    retestMsgFinal: function(){ return 'Última medición del plan: haz tus cuatro mediciones después de la entrada en calor, anótalas en «Plan completo» → Registro y compáralas con las de la semana 1. Esta semana no se cambia de nivel: anota en «Mi progreso» en cuál terminas cada ejercicio.'; },
+    retestMsgWithLevels: function(blockId, atras){ return 'Haz tus cuatro mediciones después de la entrada en calor y anótalas en una nota del teléfono (o en la tabla de «Plan completo» → Registro, si la imprimes). El plan ya propone nivel '+blockId+' en '+atras.join(", ")+': si llegas a esa posición sin dolor y respirando parejo, sube de nivel en «Mi progreso».'; },
+    retestMsgNoLevels: function(){ return 'Haz tus cuatro mediciones después de la entrada en calor y anótalas en una nota del teléfono (o en la tabla de «Plan completo» → Registro, si la imprimes), y revisa en «Mi progreso» en qué nivel estás en cada ejercicio.'; },
+    retestMsgFinal: function(){ return 'Última medición del plan: haz tus cuatro mediciones después de la entrada en calor, anótalas en una nota del teléfono (o en la tabla de «Plan completo» → Registro, si la imprimes) y compáralas con las de la semana 1. Esta semana no se cambia de nivel: anota en «Mi progreso» en cuál terminas cada ejercicio.'; },
     cardioOptional: false,
     safetyFlagWarnGlyph: false,
     homeWarningClass: "callout-accent",
@@ -682,11 +682,11 @@
       cues:["En el suelo, piernas abiertas lo que vaya cómodo, rodillas estiradas y rótulas mirando al techo","Si la espalda se redondea, siéntate sobre un cojín","Inclínate adelante desde la cadera, con el pecho largo","La meta es la cadera, no llegar con la cabeza al suelo"],
       bw:{1:{sets:2,variante:"Sobre un cojín, manos apoyadas adelante",dosis:"30–40 seg"}, 2:{sets:3,variante:"Contraer y relajar (empuja los talones contra el suelo 5 seg)",dosis:"3 ciclos"}, 3:{sets:3,variante:"Piernas más abiertas, con inclinación hacia cada pierna",dosis:"30 seg centro + 20 seg a cada lado"}, 4:{sets:3,variante:"Con el pecho adelante, levanta las manos del suelo 3 seg",dosis:"5 levantadas"}} },
     activeslr:{ name:"Elevación activa de pierna estirada", en:"Active Straight Leg Raise", patron:"Flexión de cadera activa", musculos:"Flexores de cadera, isquiotibiales", icon:"hinge", loaded:false,
-      cues:["Boca arriba, piernas estiradas, espalda baja apoyada","Sube una pierna estirada lo más alto que puedas sin ayuda de las manos","La otra pierna se queda pegada al suelo, sin doblar la rodilla","Esto es rango activo puro: lo que subes acá es rango que ya es tuyo"],
+      cues:["Boca arriba, piernas estiradas, espalda baja apoyada","Sube una pierna estirada lo más alto que puedas sin ayuda de las manos","La otra pierna se queda pegada al suelo, sin doblar la rodilla","Esto es rango activo puro: lo que subes acá es rango que ya es tuyo","Desde el nivel 3, la banda en loop alrededor de los dos pies: la pierna del suelo la sostiene y la otra sube contra ella"],
       bw:{1:{sets:2,variante:"Rango cómodo",dosis:"8 por pierna"}, 2:{sets:3,variante:"Con 2 seg arriba",dosis:"8 por pierna"}, 3:{sets:3,variante:"Con banda suave en el tobillo",dosis:"8 por pierna, 2 seg arriba"}, 4:{sets:3,variante:"Con banda media en el tobillo",dosis:"8 por pierna, 3 seg arriba"}} },
     bridge:   { name:"Puente de columna progresivo", en:"Back Bridge Progression", patron:"Extensión de columna y cadera", musculos:"Columna, flexores de cadera, hombro", icon:"hipext", loaded:false, safety:"columna",
       cues:["Empieza con un puente de glúteo: boca arriba, rodillas dobladas, sube la cadera","Estira los brazos hacia atrás por encima de la cabeza en el suelo mientras subes: abre el pecho","El arco se reparte en toda la espalda, no solo en la zona baja","Solo pasa a apoyar las manos si los niveles anteriores salen sin molestias"],
-      bw:{1:{sets:2,variante:"Puente de glúteo con brazos atrás en el suelo",dosis:"8 reps, 3 seg arriba"}, 2:{sets:3,variante:"Puente con el pecho abierto hacia la cabeza",dosis:"8 reps, 5 seg arriba"}, 3:{sets:3,variante:"Puente de hombros sobre un sillón, brazos atrás",dosis:"20 seg"}, 4:{sets:3,variante:"Manos apoyadas junto a las orejas, solo subir la cabeza del suelo",dosis:"5 x 5 seg"}} }
+      bw:{1:{sets:2,variante:"Puente de glúteo con brazos atrás en el suelo",dosis:"8 reps, 3 seg arriba"}, 2:{sets:3,variante:"Puente con el pecho abierto hacia la cabeza",dosis:"8 reps, 5 seg arriba"}, 3:{sets:3,variante:"Puente de hombros sobre un sillón, brazos atrás",dosis:"20 seg"}, 4:{sets:3,variante:"Manos junto a las orejas, dedos hacia los hombros: empuja hasta despegar la cabeza del suelo, sin llegar al puente completo",dosis:"5 x 5 seg"}} }
   };
 
   function dayFull(){
@@ -733,7 +733,7 @@
 
   var BLOCKS = [
     { id:1, key:"acumulacion", nombre:"Posiciones", sub:"Estático y técnica", weeks:"Semanas 1–8", weekStart:1, weekEnd:8, color:"amber",
-      resumen:"Base de posiciones. Cada ejercicio entra en su versión estática: llegar, respirar largo, sostener. Lo que se busca estas ocho semanas es aprender dónde se siente cada posición y en qué punto está tu 6 de 10 de tensión. Semana 1: primera medición. Semana 8: deload (la mitad de las series) y medición.",
+      resumen:"Base de posiciones. Los estiramientos entran en su versión estática —llegar, respirar largo, sostener— y los ejercicios de movilidad, en su rango cómodo y sin apuro. Lo que se busca estas ocho semanas es aprender dónde se siente cada posición y en qué punto está tu 6 de 10 de tensión. Semana 1: primera medición. Semana 8: deload (la mitad de las series) y medición.",
       progresion:"Si llegas a la posición del nivel siguiente sin dolor y respirando parejo en dos sesiones seguidas, sube de nivel en «Mi progreso». Si tira de más, quédate — no es un retroceso, es cómo funciona el método.",
       dias:diasBloque("") },
     { id:2, key:"transicion", nombre:"Contraer y relajar", sub:"El rango se abre", weeks:"Semanas 9–12", weekStart:9, weekEnd:12, color:"violet",
@@ -741,12 +741,12 @@
       progresion:"Misma regla del Bloque 1. En contraer y relajar, el empuje es firme pero no máximo (un 5 de 10): se busca soltar, no ganar una pulseada.",
       dias:diasBloque(" — contraer y relajar") },
     { id:3, key:"especializacion", nombre:"Rango activo", sub:"El rango se vuelve tuyo", weeks:"Semanas 13–20", weekStart:13, weekEnd:20, color:"accent",
-      resumen:"El paso que hace que lo ganado no se pierda: llegar al rango y sostenerlo con tu propio músculo, sin la mano ni la banda. Aparecen las elevaciones activas, las pausas en el final del rango y las versiones sin apoyo. Es también donde el cuerpo aprende a controlar lo que ya puede alcanzar. Semana 20: deload y medición.",
+      resumen:"El paso que hace que lo ganado no se pierda: llegar al rango y sostenerlo con tu propio músculo, sin que la mano o la banda te lleven. Aparecen las elevaciones activas, las pausas en el final del rango y las versiones sin apoyo. Es también donde el cuerpo aprende a controlar lo que ya puede alcanzar. Semana 20: deload y medición.",
       progresion:"Cuando la versión activa sale limpia y respirando en dos sesiones seguidas, sube de nivel. Prioriza sostener bien un rango menor por sobre alcanzar uno mayor sin control.",
       dias:diasBloque(" — rango activo") },
     { id:4, key:"integracion", nombre:"Integración", sub:"Consolidar y medir", weeks:"Semanas 21–24", weekStart:21, weekEnd:24, color:"teal",
       resumen:"Se combinan las herramientas y las posiciones se encadenan en movimiento: contraer y relajar para abrir, rango activo para cerrar. La semana 24 es la última medición — compárala con la semana 1 y conversa con el relator qué quieres entrenar en el ciclo siguiente.",
-      progresion:"Sin saltos de nivel en la semana 24: es semana de medición, no de progresión. En el resto del bloque, mantén el nivel que ya dominas y busca que la última serie se vea igual de suelta que la primera.",
+      progresion:"Sin saltos de nivel en la semana 24: es semana de medición, no de progresión. En la semana 21 el plan te propone el nivel 4 en cada ejercicio: si alguno todavía no te sale sin dolor y respirando parejo, elige en su tarjeta el nivel que dominas y quédate ahí. La meta del bloque es que la última serie se vea igual de suelta que la primera.",
       dias:diasBloque(" — integración") }
   ];
 
