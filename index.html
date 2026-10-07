@@ -914,7 +914,18 @@
     function fuerzaTopForWeek(week){
       var block = Schedule.blockForWeek(week);
       var offset = ((week - block.weekStart) % 4 + 4) % 4;
+      // Semana de deload: el tope de fuerza se queda en 90% aunque la onda
+      // caiga en su pico (la semana 20 es el offset 3 del Bloque 3 → 99%).
+      // Con el ladder fuerza eso deja 2 series (85/90) — la mitad o menos de
+      // la semana anterior. Ver spec de auditoría 2026-10-07, P1 #1.
+      if(DELOAD_WEEKS.indexOf(week)!==-1) return Math.min(FUERZA_WAVE[offset], 90);
       return FUERZA_WAVE[offset];
+    }
+    // Series de una semana de deload: la mitad, redondeando hacia arriba, y
+    // siempre las primeras (en F+H son las pesadas, que ya van topadas). El
+    // ladder fuerza no pasa por acá: su recorte lo hace el tope de 90%.
+    function deloadCount(n, week){
+      return (DELOAD_WEEKS.indexOf(week)!==-1) ? Math.ceil(n/2) : n;
     }
     // Returns the ladder rungs actually prescribed, applying (a) a per-exercise permanent
     // safety cap (via EXERCISES[id].capFuerza, e.g. a hinge exercise capped at 93%) and
@@ -977,7 +988,7 @@
       var kgPrev = OneRM.kgLabel(exId, topPrev, rmOverride);
       return kgThis!=="—" && kgThis===kgPrev;
     }
-    return { LADDER: LADDER, fuerzaTopForWeek: fuerzaTopForWeek, ladderRungsFor: ladderRungsFor, nivelActual: nivelActual, round5: round5, rungGroupsFor: rungGroupsFor, weeklyTopIsFlat: weeklyTopIsFlat };
+    return { LADDER: LADDER, fuerzaTopForWeek: fuerzaTopForWeek, deloadCount: deloadCount, ladderRungsFor: ladderRungsFor, nivelActual: nivelActual, round5: round5, rungGroupsFor: rungGroupsFor, weeklyTopIsFlat: weeklyTopIsFlat };
   })();
 
   var OneRM = (function(){
@@ -1247,7 +1258,7 @@
       var isDeload = DELOAD_WEEKS.indexOf(week)!==-1;
       var isRetest = RETEST_WEEKS.indexOf(week)!==-1;
       if(isDeload){
-        html += '<div class="banner banner-deload"><b>Semana de deload</b>Reduce el volumen a la mitad esta semana (menos series, misma técnica). El cuerpo consolida lo acumulado antes de subir de nivel.</div>';
+        html += '<div class="banner banner-deload"><b>Semana de deload</b>Esta semana las series bajan a la mitad y la carga de fuerza no pasa del 90% — cada ejercicio de hoy ya viene ajustado. Misma técnica, menos volumen: el cuerpo consolida lo acumulado antes de seguir.</div>';
       }
       if(isRetest){
         var block = Schedule.blockForWeek(week);
@@ -1289,6 +1300,7 @@
       var e = EXERCISES[row.id];
       if(!e) return "";
       var body, nivelControls = "";
+      var week = Schedule.weekFromProgramDay(programDay);
       if(row.ladder===null){
         var nivel = Progression.nivelActual(row.id, blockId);
         var dose = (e.bw && e.bw[nivel]) ? e.bw[nivel] : {sets:3, variante:"", dosis:"progresión gradual"};
@@ -1296,7 +1308,8 @@
         // pesadas + series de volumen) — ver dosisResumen().
         var dosisDeSerie = function(d, si){ return Array.isArray(d) ? (d[si] || d[d.length-1]) : d; };
         var bwRows = [];
-        for(var si=0; si<dose.sets; si++){
+        var nSets = Progression.deloadCount(dose.sets, week);
+        for(var si=0; si<nSets; si++){
           var bwKey = "chk_pd"+programDay+"_"+row.id+"_"+si;
           var bwChecked = Storage.lsGet(bwKey) === "1";
           bwRows.push('<label class="rung-row'+(bwChecked?" is-done":"")+'" data-chk-key="'+bwKey+'">'+
@@ -1318,7 +1331,8 @@
         }
       } else {
         var rm = OneRM.getRM(row.id);
-        var rungs = (row.ladder==="fuerza") ? Progression.ladderRungsFor(row.id, row.ladder, weekTopPct) : Progression.LADDER[row.ladder];
+        var rungs = (row.ladder==="fuerza") ? Progression.ladderRungsFor(row.id, row.ladder, weekTopPct)
+          : Progression.LADDER[row.ladder].slice(0, Progression.deloadCount(Progression.LADDER[row.ladder].length, week));
         var groups = Progression.rungGroupsFor(row.id, rungs, rm);
         var rows = groups.map(function(g){
           return rungGroupRowHTML(row.id, g, programDay);
